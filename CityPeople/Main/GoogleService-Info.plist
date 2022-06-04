@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>299553030612-ankj0b4adbsd0uhenq3mf1hk45l2nl7s.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.299553030612-ankj0b4adbsd0uhenq3mf1hk45l2nl7s</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCrbldovmHUNbm-1V_4GXO8s2Wn_2pw-d4</string>
+	<key>GCM_SENDER_ID</key>
+	<string>299553030612</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.neophyte.citypeople</string>
+	<key>PROJECT_ID</key>
+	<string>citypeople-e4e12</string>
+	<key>STORAGE_BUCKET</key>
+	<string>citypeople-e4e12.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:299553030612:ios:c35b989a79924885525641</string>
+</dict>
+</plist>
