@@ -9,11 +9,6 @@ import Foundation
 import CountryPicker
 import SwiftyContacts
 
-
-struct Success: Codable {
-    let status: Bool
-}
-
 struct UserResponse: Codable {
     let user: UserClass
     let status: Bool
@@ -29,10 +24,23 @@ struct User: Codable {
     let phone, name: String
     var id: Int
     var isRegistered: Bool
-    var requestStatus: Int
+    var requestStatus: RequestStatus
     var isFriend: Bool
 }
 
+enum RequestStatus: Int, Codable {
+    case none = 0
+    case requestSent
+    case requestReceived
+    
+    var title: String {
+        switch self {
+        case .none: return "Add"
+        case .requestSent: return "Requested"
+        case .requestReceived: return "Accept"
+        }
+    }
+}
 
 struct UserRequest {
     let firstName: String

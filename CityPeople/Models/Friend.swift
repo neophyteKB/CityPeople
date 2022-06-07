@@ -17,7 +17,7 @@ struct Friend: Codable {
     let id: Int
     let name, phone: String
     let alreadyFriend: Bool
-    let requestStatus: Int
+    let requestStatus: RequestStatus
 
     enum CodingKeys: String, CodingKey {
         case id, name, phone

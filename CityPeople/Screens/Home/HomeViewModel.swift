@@ -12,31 +12,33 @@ import RxSwift
 import RxRelay
 
 protocol HomeViewModelProtocol: ViewModelProtocol {
-    var users: PublishRelay<[Int]> { get }
+    var items: BehaviorRelay<[Any]> { get }
     var isContactsPermissionGranted: PublishRelay<Bool> { get }
     var isCameraPermissionGranted: PublishRelay<Bool> { get }
     var contacts: BehaviorRelay<[CNContact]> { get }
     var cameraViewModel: CameraViewModelProtocol { get }
     func onViewWillDisappear()
-    func toggleCamera()
+    func requestVideos()
     func camera(action userAction: VideoAction)
 }
 
 class HomeViewModel: HomeViewModelProtocol {
     var toastMessage = PublishRelay<FieldInputs>()
     var isContactsPermissionGranted = PublishRelay<Bool>()
-    var users = PublishRelay<[Int]>()
+    var items = BehaviorRelay<[Any]>(value: [])
     var isCameraPermissionGranted = PublishRelay<Bool>()
     var contacts = BehaviorRelay<[CNContact]>(value: [])
     var cameraViewModel: CameraViewModelProtocol = {
         CameraViewModel()
     }()
     
+    private var videos: [Video] = [Video]()
+    
     func onViewDidLoad() {
         requestContactsAccess()
         checkOrAskCameraPermissions()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            self.users.accept([0,1,2,3,4,5,6,7,8,9,10,11,12])
+        DispatchQueue.main.asyncAfter(deadline: .now()) {
+            self.items.accept([0,1,2,3,4,5,6])
         }
     }
     
@@ -44,12 +46,41 @@ class HomeViewModel: HomeViewModelProtocol {
         cameraViewModel.videoAction.accept(.remove)
     }
     
-    func toggleCamera() {
-        cameraViewModel.flipCamera()
-    }
-    
     func camera(action userAction: VideoAction) {
         cameraViewModel.videoAction.accept(userAction)
+    }
+    
+    func requestVideos() {
+        Network.request(.videos) { [weak self] (result: Result<VideosSuccess, String>) in
+            guard let self = self else { return }
+            switch result {
+            case .success(let response):
+                if response.status {
+                    if response.videos.count != self.videos.count {
+                        self.videos = response.videos
+                        self.update(values: response.videos)
+                    }
+                } else {
+                    self.toastMessage.accept(.custom(message: response.message ?? ""))
+                }
+            case .failure(let failure):
+                self.toastMessage.accept(.custom(message: failure))
+            }
+        }
+    }
+    
+    private func update(values videos: [Video]) {
+        if videos.count > items.value.count {
+            items.accept(videos)
+        } else {
+            var index = 0
+            var values = items.value
+            while index < videos.count {
+                values[index] = videos[index]
+                index += 1
+            }
+            items.accept(values)
+        }
     }
     
     private func checkOrAskCameraPermissions() {

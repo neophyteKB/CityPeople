@@ -60,9 +60,17 @@ class ContactsViewController: UIViewController, UITableViewDelegate {
             .bind(to: tableView.rx.items(cellIdentifier: ContactInfoCell.reuseIdentifier, cellType: ContactInfoCell.self)) { (index, contact, cell) in
                 cell.configure(with: contact)
                 cell.cellButtonTapped = { [weak self] in
-                    self?.viewModel.add(friend: contact)
+                    self?.viewModel.action(friend: contact, isRejected: false)
                 }
             }
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .toastMessage
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] message in
+                self?.view.makeToast(message.message)
+            })
             .disposed(by: disposeBag)
         
         viewModel
@@ -99,7 +107,9 @@ class ContactsViewController: UIViewController, UITableViewDelegate {
             .text
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] text in
-                 
+                if headerView.searchField.isFirstResponder {
+                    self?.viewModel.search(contact: text ?? "")
+                }
             })
             .disposed(by: disposeBag)
     }

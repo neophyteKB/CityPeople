@@ -35,14 +35,16 @@ class HomeViewController: UIViewController {
         collectionView.register(UserCollectionViewCell.self, forCellWithReuseIdentifier: UserCollectionViewCell.reuseIdentifier)
         return collectionView
     }()
-    private let loadingTitle: UILabel = {
+    private let timeLabel: UILabel = {
         let label = UILabel()
-        label.text = "Loading..."
+        label.text = ""
+        label.textColor = .black
         label.font = .font(name: .italic, size: Constants.loadingTextFontSize)
         return label
     }()
     private let rearCameraVideoRecordingButton = UIButton()
     private let frontCameraVideoRecordingButton = UIButton()
+    private var timer: Timer?
     
     // Private Properties
     private let viewModel: HomeViewModelProtocol = HomeViewModel()
@@ -58,6 +60,7 @@ class HomeViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        viewModel.requestVideos()
         DispatchQueue.main.async {
             self.frontCameraVideoRecordingButton.animate(duration: 0, color: .cityGreen)
             self.rearCameraVideoRecordingButton.animate(duration: 0, color: .cityGreen)
@@ -69,8 +72,8 @@ class HomeViewController: UIViewController {
         view.subviews {
             navigationTitleView
             headerView
+            timeLabel
             collectionView
-            loadingTitle
             rearCameraVideoRecordingButton
             frontCameraVideoRecordingButton
         }
@@ -85,13 +88,15 @@ class HomeViewController: UIViewController {
             .height(HomeScreenHeaderView.headerHeight)
             .Top == navigationTitleView.Bottom
         
+        timeLabel
+            .right(Constants.viewPadding)
+            .height(Constants.timeLabelHeight)
+            .Top == headerView.Bottom + Constants.viewPadding
+        
         collectionView
             .fillHorizontally()
             .bottom(Constants.zeroValue)
-            .Top == headerView.Bottom
-        
-        loadingTitle
-            .centerInContainer()
+            .Top == timeLabel.Bottom + Constants.viewPadding
         
         rearCameraVideoRecordingButton
             .centerHorizontally()
@@ -105,6 +110,11 @@ class HomeViewController: UIViewController {
     }
     
     private func setupViewBindings() {
+        frontCameraVideoRecordingButton.addTarget(self, action: #selector(btnPressed(_:)), for: .touchDown)
+        frontCameraVideoRecordingButton.addTarget(self, action: #selector(btnReleased), for: .touchUpInside)
+        rearCameraVideoRecordingButton.addTarget(self, action: #selector(btnPressed(_:)), for: .touchDown)
+        rearCameraVideoRecordingButton.addTarget(self, action: #selector(btnReleased), for: .touchUpInside)
+        
         viewModel
             .isCameraPermissionGranted
             .observe(on: MainScheduler.instance)
@@ -116,24 +126,6 @@ class HomeViewController: UIViewController {
                     self.alert(message: Constants.cameraPermissionMessage)
                 }
             })
-            .disposed(by: disposeBag)
-        
-        frontCameraVideoRecordingButton
-            .rx
-            .tap
-            .bind { [weak self] in
-                self?.viewModel.camera(action: .start)
-                self?.frontCameraVideoRecordingButton.animate(duration: Constants.videoRecordingLength, color: .white)
-            }
-            .disposed(by: disposeBag)
-        
-        rearCameraVideoRecordingButton
-            .rx
-            .tap
-            .bind { [weak self] in
-                self?.viewModel.camera(action: .stop)
-//                self?.frontCameraVideoRecordingButton.animate(duration: Constants.videoRecordingLength, color: .white)
-            }
             .disposed(by: disposeBag)
         
         viewModel
@@ -163,21 +155,53 @@ class HomeViewController: UIViewController {
             .disposed(by: disposeBag)
         
         viewModel
-            .users
+            .items
             .bind(to: collectionView.rx.items(cellIdentifier: UserCollectionViewCell.reuseIdentifier,
-                                              cellType: UserCollectionViewCell.self)) { (collectionView, row, element) in
-                print(element)
+                                              cellType: UserCollectionViewCell.self)) { (row, element, cell) in
+                cell.configure(with: element)
             }
             .disposed(by: disposeBag)
         
-        viewModel
-            .users
+        collectionView
+            .rx
+            .modelSelected(Video.self)
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] users in
-                self?.loadingTitle.isHidden = !users.isEmpty
-            })
-            .disposed(by: disposeBag)
+            .subscribe(onNext: { item in
+                if let url = item.url.url {
+                    Router.presentVideo(videoURL: url)
+                }
+            }).disposed(by: disposeBag)
         
+    }
+    
+    @objc private func btnPressed(_ sender: UIButton) {
+        sender.animate(duration: Constants.videoRecordingLength, color: .white)
+        let cameraSide: CameraSide = sender == frontCameraVideoRecordingButton ? .front : .rear
+        viewModel.cameraViewModel.flipCamera(to: cameraSide)
+        viewModel.camera(action: .start)
+        headerView.video(state: .start)
+        showTimer()
+    }
+    
+    @objc private func btnReleased() {
+        viewModel.camera(action: .stop)
+        headerView.video(state: .stop)
+        timer?.invalidate()
+        timeLabel.text = ""
+    }
+    
+    private func showTimer() {
+        var timePassed = 0
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { [weak self] timer in
+            guard let self = self else { return }
+            timePassed += 1
+            let minutes = timePassed / 60
+            let seconds = timePassed % 60
+            self.timeLabel.text = String(format:"%02d:%02d", minutes, seconds)
+            if timePassed == Int(Constants.videoRecordingLength) {
+                self.btnReleased()
+            }
+        })
     }
     
     private func showCamera() {
@@ -219,6 +243,7 @@ private enum Constants {
     static let viewPadding: CGFloat = 16.0
     static let loadingTextFontSize: CGFloat = 16.0
     static let titleViewHeight: CGFloat = 24.0
+    static let timeLabelHeight: CGFloat = 20.0
     static let videoRecordingLength: CGFloat = 10.0
     
     static let logoIcon = "citypeople_logo_splash"

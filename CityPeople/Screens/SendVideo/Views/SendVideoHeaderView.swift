@@ -39,12 +39,11 @@ class SendVideoHeaderView: UITableViewHeaderFooterView {
         return label
     }()
     
-    let searchField: UITextField = {
-        let textField = UITextField()
+    let searchField: SearchField = {
+        let textField = SearchField()
         textField.placeholder = Constants.search
         textField.font = .font(name: .regular, size: Constants.textFieldFontSize)
         textField.textColor = .black
-        textField.borderStyle = .roundedRect
         return textField
     }()
     
@@ -89,8 +88,9 @@ class SendVideoHeaderView: UITableViewHeaderFooterView {
         cantSeeYourselfLabel.Trailing >= videoView.Leading - Constants.viewPadding
         
         searchField.leading(Constants.viewPadding)
-        searchField.Top == cantSeeYourselfLabel.Bottom + Constants.viewPadding
-        searchField.Trailing >= videoView.Leading - Constants.viewPadding
+            .fillHorizontally(padding: Constants.viewPadding)
+            .height(Constants.searchFieldHeight)
+        searchField.Top == videoView.Bottom + Constants.viewPadding
         searchField.Bottom == contentView.Bottom - Constants.viewPadding
         
         videoView
@@ -107,7 +107,7 @@ class SendVideoHeaderView: UITableViewHeaderFooterView {
         static let search = "Seacrh"
         static let backIcon = "circle_back_button"
         static let screenWidth = UIScreen.main.bounds.size.width
-        static let cameraWidth = screenWidth * 0.3
+        static let cameraWidth = screenWidth * 0.25
         static let cameraHeight = cameraWidth * (16/9)
         static let fieldHeight = 44
         static let textFieldFontSize = 14.0
@@ -116,6 +116,7 @@ class SendVideoHeaderView: UITableViewHeaderFooterView {
         static let extraSpaceConstant = 80.0
         static let viewPadding = 16.0
         static let zeroValue = 0.0
+        static let searchFieldHeight = 36.0
     }
 
 }

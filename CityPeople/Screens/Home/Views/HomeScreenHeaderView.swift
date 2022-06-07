@@ -107,8 +107,8 @@ class HomeScreenHeaderView: UIView, HomeScreenHeaderProtocol {
     }()
     
     // Search bar
-    private let searchBar: UITextField = {
-        let searchTextField = UITextField()
+    private let searchBar: SearchField = {
+        let searchTextField = SearchField()
         searchTextField.font = .font(name: .regular, size: Constants.fontSize)
         searchTextField.placeholder = "Search"
         return searchTextField
@@ -135,7 +135,7 @@ class HomeScreenHeaderView: UIView, HomeScreenHeaderProtocol {
     var pushView = PublishRelay<ViewType>()
     
     // MARK: - Private Properties
-    private var locationManager = LocationManager()
+    private var locationManager = LocationManager.shared
     private var disposeBag = DisposeBag()
     private var location: CLLocation?
     private var cameraViewModel: CameraViewModelProtocol!
@@ -160,6 +160,7 @@ class HomeScreenHeaderView: UIView, HomeScreenHeaderProtocol {
             menuStackView
             cameraView
         }
+        searchBar.height(Constants.searchFieldHeight)
         
         cameraView
             .top(Constants.viewPadding)
@@ -216,15 +217,23 @@ class HomeScreenHeaderView: UIView, HomeScreenHeaderProtocol {
             .disposed(by: disposeBag)
     }
     
+    func video(state: VideoAction) {
+        if state == .start {
+            cameraView.setBorder(with: .cityGreen, of: 2.0, cornerRadius: 0.0)
+        } else {
+            cameraView.setBorder(with: .white, of: 2.0, cornerRadius: 0.0)
+        }
+    }
     
     private enum Constants {
         static let screenWidth = UIScreen.main.bounds.size.width
-        static let cameraWidth = screenWidth * 0.3
+        static let cameraWidth = screenWidth * 0.25
         static let cameraHeight = cameraWidth * (16/9)
         static let fontSize = 12.0
         static let viewPadding = 16.0
         static let menuStackSpacing = 24.0
         static let iconStackViewSpacing = 4.0
+        static let searchFieldHeight = 36.0
     }
 }
 

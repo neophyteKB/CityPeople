@@ -153,7 +153,9 @@ class CreateGroupViewController: UIViewController, UITableViewDelegate {
             .text
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] text in
-                 
+                if headerView.searchField.isFirstResponder {
+                    self?.viewModel.search(contact: text ?? "")
+                }
             })
             .disposed(by: disposeBag)
                        

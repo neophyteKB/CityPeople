@@ -15,8 +15,9 @@ protocol LocationManagerProtocol {
 }
 
 class LocationManager: NSObject, LocationManagerProtocol {
+    static let shared = LocationManager()
     var locality = PublishRelay<String>()
-    
+    var locationString: String = "-NA-"
     
     var permissionDenied = PublishRelay<Void>()
     var location = PublishRelay<CLLocation>()
@@ -59,11 +60,14 @@ extension LocationManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
         self.location.accept(location)
-        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
+        CLGeocoder().reverseGeocodeLocation(location) { [weak self] placemarks, error in
+            guard let self = self else { return }
             if error != nil {
                 self.locality.accept("-NA-")
             } else if let placemark = placemarks?.first {
-                self.locality.accept(placemark.name ?? placemark.locality ?? placemark.administrativeArea ?? "")
+                let locality = placemark.name ?? placemark.locality ?? placemark.administrativeArea ?? "-NA-"
+                self.locality.accept(locality)
+                self.locationString = locality
             }
         }
     }

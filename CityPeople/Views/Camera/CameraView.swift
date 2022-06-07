@@ -27,7 +27,7 @@ class CameraView: UIView {
     
     private var cameraViewModel: CameraViewModelProtocol!
     private let disposeBag = DisposeBag()
-    private var usingFrontCamera = false
+    private let currentCameraSide: CameraSide = .front
     
     init(cameraViewModel: CameraViewModelProtocol) {
         super.init(frame: .zero)
@@ -44,12 +44,11 @@ class CameraView: UIView {
 // MARK: - Private methods
     private func setupCamera() {
         do {
-            let input = try AVCaptureDeviceInput(device: getFrontCamera())
+            let input = try AVCaptureDeviceInput(device: currentCameraSide == .front ? getFrontCamera() : getBackCamera())
             captureSession.addInput(input)
             
             // Get an instance of ACCapturePhotoOutput class
             videoOutput = AVCaptureMovieFileOutput()
-//            videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue.main)
             // Set the output on the capture session
             captureSession.addOutput(videoOutput)
             
@@ -79,8 +78,8 @@ class CameraView: UIView {
         cameraViewModel
             .toggleCamera
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] in
-                self?.toggleCamera()
+            .subscribe(onNext: { [weak self] side in
+                self?.toggleCamera(to: side)
             })
             .disposed(by: disposeBag)
     }
@@ -95,14 +94,16 @@ class CameraView: UIView {
         return device
     }
     
-    private func toggleCamera() {
-        usingFrontCamera = !usingFrontCamera
+    private func toggleCamera(to side: CameraSide) {
+        // Don't toggle if requested side is same to current one
+        if side == currentCameraSide { return }
+        
         do{
             captureSession.removeInput(captureSession.inputs.first!)
             
-            if(usingFrontCamera){
+            if(side == .front){
                 cameraDevice = getFrontCamera()
-            }else{
+            } else {
                 cameraDevice = getBackCamera()
             }
             let input = try AVCaptureDeviceInput(device: cameraDevice)

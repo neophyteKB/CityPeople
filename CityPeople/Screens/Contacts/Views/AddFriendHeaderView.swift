@@ -17,12 +17,11 @@ class AddFriendHeaderView: UITableViewHeaderFooterView {
         return button
     }()
     
-    let searchField: UITextField = {
-        let textField = UITextField()
+    let searchField: SearchField = {
+        let textField = SearchField()
         textField.placeholder = Constants.searchPlaceholder
         textField.font = .font(name: .regular, size: Constants.textFieldFontSize)
         textField.textColor = .black
-        textField.borderStyle = .roundedRect
         return textField
     }()
     
@@ -58,6 +57,7 @@ class AddFriendHeaderView: UITableViewHeaderFooterView {
         
         searchField
             .fillHorizontally(padding: Constants.viewPadding)
+            .height(Constants.searchFieldHeight)
             .Top == backButton.Bottom + Constants.viewPadding
            
         friendLabel
@@ -78,6 +78,7 @@ class AddFriendHeaderView: UITableViewHeaderFooterView {
         static let extraSpaceConstant = 80.0
         static let viewPadding = 16.0
         static let zeroValue = 0.0
+        static let searchFieldHeight = 36.0
     }
 
 }

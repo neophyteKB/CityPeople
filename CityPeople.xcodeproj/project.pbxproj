@@ -42,6 +42,9 @@
 		8E19CA5D2818512D0031D653 /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8E19CA4A2818512D0031D653 /* Poppins-SemiBold.ttf */; };
 		8E19CA5E2818512D0031D653 /* Poppins-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8E19CA4B2818512D0031D653 /* Poppins-Italic.ttf */; };
 		8E19CA5F2818512D0031D653 /* Poppins-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8E19CA4C2818512D0031D653 /* Poppins-MediumItalic.ttf */; };
+		8E1F6592284B81FA007C1E37 /* Success.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1F6591284B81FA007C1E37 /* Success.swift */; };
+		8E1F6598284CFCDC007C1E37 /* SearchField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1F6597284CFCDC007C1E37 /* SearchField.swift */; };
+		8E1F659A284FA28B007C1E37 /* Videos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1F6599284FA28B007C1E37 /* Videos.swift */; };
 		8E4E57EA284A5E440030F9AB /* SendVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E4E57E9284A5E440030F9AB /* SendVideoViewController.swift */; };
 		8E4E57EC284A5E500030F9AB /* SendVideoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E4E57EB284A5E500030F9AB /* SendVideoViewModel.swift */; };
 		8E4E57EE284A62C10030F9AB /* SendVideoHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E4E57ED284A62C10030F9AB /* SendVideoHeaderView.swift */; };
@@ -137,6 +140,9 @@
 		8E19CA4A2818512D0031D653 /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
 		8E19CA4B2818512D0031D653 /* Poppins-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Italic.ttf"; sourceTree = "<group>"; };
 		8E19CA4C2818512D0031D653 /* Poppins-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-MediumItalic.ttf"; sourceTree = "<group>"; };
+		8E1F6591284B81FA007C1E37 /* Success.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Success.swift; sourceTree = "<group>"; };
+		8E1F6597284CFCDC007C1E37 /* SearchField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchField.swift; sourceTree = "<group>"; };
+		8E1F6599284FA28B007C1E37 /* Videos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Videos.swift; sourceTree = "<group>"; };
 		8E4E57E9284A5E440030F9AB /* SendVideoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendVideoViewController.swift; sourceTree = "<group>"; };
 		8E4E57EB284A5E500030F9AB /* SendVideoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendVideoViewModel.swift; sourceTree = "<group>"; };
 		8E4E57ED284A62C10030F9AB /* SendVideoHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendVideoHeaderView.swift; sourceTree = "<group>"; };
@@ -228,6 +234,7 @@
 				8E19CA2E2816912A0031D653 /* Views */,
 				8E19CA2A281681AD0031D653 /* Utilities */,
 				8E19CA2428167C800031D653 /* Router */,
+				8E5FE24228411BB5003A111D /* Models */,
 				8E19CA2028167A120031D653 /* Screens */,
 				8E19CA1F281679E20031D653 /* Storyboards */,
 				8E19CA1E281679B70031D653 /* Main */,
@@ -312,6 +319,7 @@
 				8EA6A0712819466D00D3ADEB /* Font_Extension.swift */,
 				8EA093EB283A42A500993014 /* Network.swift */,
 				8E510278283C055200D57F47 /* Extensions.swift */,
+				8E1F6597284CFCDC007C1E37 /* SearchField.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -320,7 +328,6 @@
 			isa = PBXGroup;
 			children = (
 				8E5FE23B283FDBB8003A111D /* OTPView */,
-				8E19CA342816E8290031D653 /* HomeScreenHeader */,
 				8E19CA31281693C20031D653 /* Camera */,
 			);
 			path = Views;
@@ -333,14 +340,6 @@
 				8E19CA32281693D20031D653 /* CameraViewModel.swift */,
 			);
 			path = Camera;
-			sourceTree = "<group>";
-		};
-		8E19CA342816E8290031D653 /* HomeScreenHeader */ = {
-			isa = PBXGroup;
-			children = (
-				8E19CA352816E84E0031D653 /* HomeScreenHeaderView.swift */,
-			);
-			path = HomeScreenHeader;
 			sourceTree = "<group>";
 		};
 		8E19CA392818512D0031D653 /* Poppins */ = {
@@ -390,6 +389,7 @@
 		8E510275283BFBC000D57F47 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				8E19CA352816E84E0031D653 /* HomeScreenHeaderView.swift */,
 				8E510276283BFBE900D57F47 /* UserCollectionViewCell.swift */,
 			);
 			path = Views;
@@ -398,7 +398,6 @@
 		8E51027A283D296F00D57F47 /* Registration */ = {
 			isa = PBXGroup;
 			children = (
-				8E5FE24228411BB5003A111D /* Models */,
 				8E51027B283D298F00D57F47 /* RegistrationViewController.swift */,
 				8E51027F283D29B100D57F47 /* RegistrationViewModel.swift */,
 				8E51027D283D29A500D57F47 /* OTPViewController.swift */,
@@ -432,6 +431,8 @@
 			children = (
 				8E5FE24328411BD6003A111D /* UserRequest.swift */,
 				8E5FE245284275B6003A111D /* Friend.swift */,
+				8E1F6591284B81FA007C1E37 /* Success.swift */,
+				8E1F6599284FA28B007C1E37 /* Videos.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -638,6 +639,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8E19C9F3281678EA0031D653 /* HomeViewController.swift in Sources */,
+				8E1F6592284B81FA007C1E37 /* Success.swift in Sources */,
 				8EA093AC2824CA2000993014 /* FriendListCell.swift in Sources */,
 				8E5298362821099900CD7E4D /* ContactsViewController.swift in Sources */,
 				8E5298342821098700CD7E4D /* ContactsViewModel.swift in Sources */,
@@ -659,6 +661,7 @@
 				8E19CA33281693D20031D653 /* CameraViewModel.swift in Sources */,
 				8E510277283BFBE900D57F47 /* UserCollectionViewCell.swift in Sources */,
 				8EA093A72823A31000993014 /* CreateGroupViewController.swift in Sources */,
+				8E1F659A284FA28B007C1E37 /* Videos.swift in Sources */,
 				8EA093AF282582F700993014 /* CityPeople.xcdatamodeld in Sources */,
 				8EA6A0722819466E00D3ADEB /* Font_Extension.swift in Sources */,
 				8EA093AA2824C9F500993014 /* CreateGroupHeaderView.swift in Sources */,
@@ -668,6 +671,7 @@
 				8E5FE23D283FDBB8003A111D /* OTPView.swift in Sources */,
 				8E19CA2328167A740031D653 /* HomeViewModel.swift in Sources */,
 				8E5FE241283FDBFF003A111D /* VerifyOtpViewController.swift in Sources */,
+				8E1F6598284CFCDC007C1E37 /* SearchField.swift in Sources */,
 				8E19CA362816E84E0031D653 /* HomeScreenHeaderView.swift in Sources */,
 				8EA093A52823A2FD00993014 /* CreateGroupViewModel.swift in Sources */,
 				8E4E57EA284A5E440030F9AB /* SendVideoViewController.swift in Sources */,

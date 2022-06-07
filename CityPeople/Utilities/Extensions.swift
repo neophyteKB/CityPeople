@@ -12,7 +12,7 @@ extension  UIView {
         layer.cornerRadius = cornerRadius
         layer.borderColor = color.cgColor
         layer.borderWidth = width
-        layer.masksToBounds = true
+        clipsToBounds = true
     }
     
     func roundCorners(radius: CGFloat) {

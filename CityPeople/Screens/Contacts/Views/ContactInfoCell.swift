@@ -35,6 +35,14 @@ class ContactInfoCell: UITableViewCell {
         return btn
     }()
     
+    private let secondaryRightButton: UIButton = {
+        let btn = UIButton()
+        btn.titleLabel?.font = .font(name: .regular, size: Constants.btnFontSize)
+        btn.setTitleColor(.black, for: .normal)
+        btn.setBorder(with: .cityGreen, cornerRadius: Constants.btnHeight/2)
+        return btn
+    }()
+    
     private let disposeBag = DisposeBag()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -49,8 +57,17 @@ class ContactInfoCell: UITableViewCell {
     
     func configure(with user: User) {
         title.text = user.name
-        let buttonTitle = user.isRegistered ? "Add" : "Invite"
-        primaryRightButton.setTitle(buttonTitle, for: .normal)
+        secondaryRightButton.isHidden = true
+        if user.isFriend {
+            primaryRightButton.isHidden = true 
+        } else if user.isRegistered {
+            primaryRightButton.setTitle(user.requestStatus.title, for: .normal)
+            if user.requestStatus == .requestReceived {
+                secondaryRightButton.isHidden = false
+            }
+        } else {
+            primaryRightButton.setTitle(Constants.invite, for: .normal)
+        }
     }
     
     // MARK: - Private Methods
@@ -59,6 +76,7 @@ class ContactInfoCell: UITableViewCell {
             imageViewIcon
             title
             primaryRightButton
+            secondaryRightButton
         }
         
         imageViewIcon
@@ -69,9 +87,12 @@ class ContactInfoCell: UITableViewCell {
         title
             .centerVertically()
             .Leading == imageViewIcon.Trailing + Constants.viewPadding
+         
+        secondaryRightButton.Leading >= title.Trailing + Constants.viewPadding
+        primaryRightButton.CenterY == title.CenterY
         
         primaryRightButton.right(Constants.viewPadding).height(Constants.btnHeight).width(Constants.btnWidth)
-        primaryRightButton.Leading >= title.Trailing + Constants.viewPadding
+        primaryRightButton.Leading >= secondaryRightButton.Trailing + Constants.viewPadding
         primaryRightButton.CenterY == title.CenterY
     }
     
@@ -88,11 +109,12 @@ class ContactInfoCell: UITableViewCell {
     private enum Constants {
         static let viewPadding: CGFloat = 16.0
         static let titleFontSize: CGFloat = 16.0
-        static let btnFontSize: CGFloat = 14.0
+        static let btnFontSize: CGFloat = 12.0
         static let btnHeight: CGFloat = 28.0
         static let btnWidth: CGFloat = 72.0
         static let unchecked = "unchecked"
         static let checked = "check"
         static let friendIcon = "friends"
+        static let invite = "Invite"
     }
 }

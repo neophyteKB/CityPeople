@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import AVKit
 import Contacts
 
 struct Router {
@@ -45,6 +46,15 @@ struct Router {
     static func pushHomeViewController() {
         let homeVC = HomeViewController()
         navigationController.pushViewController(homeVC, animated: true)
+    }
+    
+    static func presentVideo(videoURL: URL) {
+        let player = AVPlayer(url: videoURL)
+        let playerViewController = AVPlayerViewController()
+        playerViewController.player = player
+        navigationController.present(playerViewController, animated: true) {
+            playerViewController.player!.play()
+        }
     }
     
     static func pushContactsViewController(contacts: [CNContact]) {

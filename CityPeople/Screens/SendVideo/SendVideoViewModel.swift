@@ -16,7 +16,8 @@ protocol SendVideoViewModelProtocol: ViewModelProtocol {
     var friends: BehaviorRelay<[Friend]> { get }
     func update(with contact: Friend)
     func isAlreadySelected(_ friend: Friend) -> Bool
-    func sendVideo()
+    func sendVideo(to friend: Friend)
+    func search(contact keyword: String)
 }
 
 class SendVideoViewModel: SendVideoViewModelProtocol {
@@ -28,6 +29,7 @@ class SendVideoViewModel: SendVideoViewModelProtocol {
     
     private let videoLink: URL
     private let contacts: [CNContact]
+    private lazy var allFriends = [Friend]()
     private lazy var selectedFriends = [Friend]()
     
     init(videoLink: URL, contacts: [CNContact]) {
@@ -53,7 +55,30 @@ class SendVideoViewModel: SendVideoViewModelProtocol {
     }
     
     func sendVideo(to friend: Friend) {
-        let params = [ApiConstants.ids.]
+        showLoader.accept(true)
+        let params: [String: Any] = [ApiConstants.groups.rawValue: [friend.id],
+                                     ApiConstants.location.rawValue: LocationManager.shared.locationString]
+        Network.request(.sendVideo, isMultipart: true, file: videoLink, params: params) { [weak self] (result: Result<Success, String>) in
+            guard let self = self else { return }
+            switch result {
+            case .success(let response):
+                self.toastMessage.accept(.custom(message: response.message ?? ""))
+            case .failure(let error):
+                self.toastMessage.accept(.custom(message: error))
+            }
+            self.showLoader.accept(false)
+        }
+    }
+    
+    func search(contact keyword: String) {
+        if keyword.isEmpty {
+            self.friends.accept(allFriends)
+        } else {
+            let filteredContacts = allFriends.filter { contact in
+                (contact.name.range(of: keyword, options: .caseInsensitive) != nil)
+            }
+            self.friends.accept(filteredContacts)
+        }
     }
     
     private func fetchFriends() {
@@ -68,6 +93,7 @@ class SendVideoViewModel: SendVideoViewModelProtocol {
             switch result {
             case let .success(response):
                 self.friends.accept(response.users)
+                self.allFriends = response.users
             case let .failure(error):
                 self.toastMessage.accept(.custom(message: error))
             }

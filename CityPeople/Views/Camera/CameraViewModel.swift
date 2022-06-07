@@ -11,21 +11,25 @@ import RxRelay
 
 protocol CameraViewModelProtocol {
     var videoAction: PublishRelay<VideoAction> { get }
-    var toggleCamera: PublishRelay<Void> { get }
+    var toggleCamera: PublishRelay<CameraSide> { get }
     var video: PublishRelay<URL> { get }
-    func flipCamera()
+    func flipCamera(to side: CameraSide)
 }
 
 class CameraViewModel: CameraViewModelProtocol {
     var videoAction = PublishRelay<VideoAction>()
-    var toggleCamera = PublishRelay<Void>()
+    var toggleCamera = PublishRelay<CameraSide>()
     var video = PublishRelay<URL>()
     
-    func flipCamera() {
-        toggleCamera.accept(())
+    func flipCamera(to side: CameraSide) {
+        toggleCamera.accept(side)
     }
 }
 
 enum VideoAction {
     case show, start, stop, remove
+}
+
+enum CameraSide {
+    case front, rear
 }

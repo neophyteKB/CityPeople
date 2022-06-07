@@ -94,7 +94,7 @@ class SendVideoViewController: UIViewController, UITableViewDelegate {
                 cell.configure(with: friend, isSelected: isSelected)
                 cell.btnSelectFriendTapped = { [weak self] in
                     self?.viewModel.update(with: friend)
-                    self?.sendVideo(to: friend)
+                    self?.viewModel.sendVideo(to: friend)
                 }
                 cell.selectionStyle = .none
             }.disposed(by: disposeBag)
@@ -123,10 +123,18 @@ class SendVideoViewController: UIViewController, UITableViewDelegate {
                 Router.popVC()
             }
             .disposed(by: disposeBag)
-    }
-    
-    private func sendVideo(to friend: Friend) {
         
+        headerView
+            .searchField
+            .rx
+            .text
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] text in
+                if headerView.searchField.isFirstResponder {
+                    self?.viewModel.search(contact: text ?? "")
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {

@@ -18,6 +18,7 @@ protocol CreateGroupViewModelProtocol: ViewModelProtocol {
     func isAlreadySelected(_ friend: Friend) -> Bool
     func update(with contact: Friend)
     func createGroup(name: String)
+    func search(contact keyword: String)
 }
 
 class CreateGroupViewModel: CreateGroupViewModelProtocol {
@@ -26,7 +27,8 @@ class CreateGroupViewModel: CreateGroupViewModelProtocol {
     var showLoader = PublishRelay<Bool>()
     var toastMessage = PublishRelay<FieldInputs>()
     var isContactsPermissionGranted = PublishRelay<Bool>()
-  
+    private lazy var allFriends = [Friend]()
+    
     private let contacts: [CNContact]
     
     init(contacts: [CNContact]) {
@@ -50,6 +52,7 @@ class CreateGroupViewModel: CreateGroupViewModelProtocol {
             switch result {
             case let .success(response):
                 self.friends.accept(response.users)
+                self.allFriends = response.users
             case let .failure(error):
                 self.toastMessage.accept(.custom(message: error))
             }
@@ -85,5 +88,16 @@ class CreateGroupViewModel: CreateGroupViewModelProtocol {
             selected.append(contact)
         }
         selectedFriends.accept(selected)
+    }
+    
+    func search(contact keyword: String) {
+        if keyword.isEmpty {
+            self.friends.accept(allFriends)
+        } else {
+            let filteredContacts = allFriends.filter { contact in
+                (contact.name.range(of: keyword, options: .caseInsensitive) != nil)
+            }
+            self.friends.accept(filteredContacts)
+        }
     }
 }

@@ -31,12 +31,11 @@ class CreateGroupHeaderView: UITableViewHeaderFooterView {
         textField.placeholder = Constants.groupNamePlaceholder
         textField.font = .font(name: .regular, size: Constants.textFieldFontSize)
         textField.textColor = .black
-        textField.borderStyle = .roundedRect
         return textField
     }()
     
-    let searchField: UITextField = {
-        let textField = UITextField()
+    let searchField: SearchField = {
+        let textField = SearchField()
         textField.placeholder = Constants.searchPlaceholder
         textField.font = .font(name: .regular, size: Constants.textFieldFontSize)
         textField.textColor = .black
@@ -86,6 +85,7 @@ class CreateGroupHeaderView: UITableViewHeaderFooterView {
             
         searchField
             .fillHorizontally(padding: Constants.viewPadding)
+            .height(Constants.searchFieldHeight)
             .Top == groupNameField.Bottom + Constants.viewPadding
            
         friendLabel
@@ -106,5 +106,6 @@ class CreateGroupHeaderView: UITableViewHeaderFooterView {
         static let extraSpaceConstant = 80.0
         static let viewPadding = 16.0
         static let zeroValue = 0.0
+        static let searchFieldHeight = 36.0
     }
 }
