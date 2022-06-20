@@ -17,6 +17,7 @@ protocol HomeViewModelProtocol: ViewModelProtocol {
     var isCameraPermissionGranted: PublishRelay<Bool> { get }
     var contacts: BehaviorRelay<[CNContact]> { get }
     var cameraViewModel: CameraViewModelProtocol { get }
+    var videos: [UserVideo] { get }
     func onViewWillDisappear()
     func requestVideos()
     func camera(action userAction: VideoAction)
@@ -29,10 +30,10 @@ class HomeViewModel: HomeViewModelProtocol {
     var isCameraPermissionGranted = PublishRelay<Bool>()
     var contacts = BehaviorRelay<[CNContact]>(value: [])
     var cameraViewModel: CameraViewModelProtocol = {
-        CameraViewModel()
+        CameraViewModel(cameraSide: .front)
     }()
     
-    private var videos: [Video] = [Video]()
+    var videos: [UserVideo] = [UserVideo]()
     
     func onViewDidLoad() {
         requestContactsAccess()
@@ -56,10 +57,16 @@ class HomeViewModel: HomeViewModelProtocol {
             switch result {
             case .success(let response):
                 if response.status {
-                    if response.videos.count != self.videos.count {
-                        self.videos = response.videos
-                        self.update(values: response.videos)
+                    var userVideos = [UserVideo]()
+                    var allVideos = response.videos
+                    while !allVideos.isEmpty {
+                        let video = allVideos.first!
+                        let userVideo = UserVideo(name: video.name, userId: video.userId, videos: allVideos.filter({$0.userId == video.userId}))
+                        allVideos = allVideos.filter({$0.userId != video.userId})
+                        userVideos.append(userVideo)
                     }
+                    self.videos = userVideos
+                    self.update(values: userVideos)
                 } else {
                     self.toastMessage.accept(.custom(message: response.message ?? ""))
                 }
@@ -69,7 +76,7 @@ class HomeViewModel: HomeViewModelProtocol {
         }
     }
     
-    private func update(values videos: [Video]) {
+    private func update(values videos: [UserVideo]) {
         if videos.count > items.value.count {
             items.accept(videos)
         } else {

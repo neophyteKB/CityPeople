@@ -123,8 +123,16 @@ class HomeViewController: UIViewController {
                 if isGranted {
                     self.showCamera()
                 } else {
-                    self.alert(message: Constants.cameraPermissionMessage)
+                    self.alert(message: AppConstants.cameraPermissionMessage)
                 }
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .toastMessage
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] message in
+                self?.view.makeToast(message.message)
             })
             .disposed(by: disposeBag)
         
@@ -164,12 +172,12 @@ class HomeViewController: UIViewController {
         
         collectionView
             .rx
-            .modelSelected(Video.self)
+            .modelSelected(UserVideo.self)
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { item in
-                if let url = item.url.url {
-                    Router.presentVideo(videoURL: url)
-                }
+            .subscribe(onNext: { [weak self] item in
+                guard let self = self else { return }
+                Router.pushVideoPlayerViewController(self.viewModel.videos, selected: item,
+                                                     cameraSide: self.viewModel.cameraViewModel.cameraSide)
             }).disposed(by: disposeBag)
         
     }
@@ -215,17 +223,9 @@ class HomeViewController: UIViewController {
             Router.pushContactsViewController(contacts: viewModel.contacts.value)
         case .group:
             // Push to Group
-            Router.pushCreateGroupViewController(contacts: viewModel.contacts.value)
+            Router.pushCreateGroupViewController(contacts: viewModel.contacts.value,
+                                                 side: viewModel.cameraViewModel.cameraSide)
         }
-    }
-    
-    private func alert(message: String) {
-        let alert = UIAlertController(title: "Settings", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .destructive))
-        alert.addAction(UIAlertAction(title: "Go to Settings", style: .default, handler: { _ in
-            Router.showAppSettings()
-        }))
-        present(alert, animated: true)
     }
 }
 
@@ -252,11 +252,14 @@ private enum Constants {
     static let settings = "Settings"
     static let cancel = "Cancel"
     static let gotoSettings = "Go to Settings"
-    static let cameraPermissionMessage = "You have denied the camera permissions, to continue please enable camera permissions from Settings."
     static let locationPermissionMessage = "You have denied the location permission, to continue please enable the location permissions from Settings."
 }
 
-private extension UIButton {
+enum AppConstants {
+    static let cameraPermissionMessage = "You have denied the camera permissions, to continue please enable camera permissions from Settings."
+}
+
+extension UIButton {
     func animate(duration: CGFloat, color: UIColor) {
         let storkeLayer = CAShapeLayer()
         storkeLayer.fillColor = UIColor.clear.cgColor

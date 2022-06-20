@@ -7,7 +7,6 @@
 
 import Foundation
 import UIKit
-import AVKit
 import Contacts
 
 struct Router {
@@ -45,16 +44,7 @@ struct Router {
     
     static func pushHomeViewController() {
         let homeVC = HomeViewController()
-        navigationController.pushViewController(homeVC, animated: true)
-    }
-    
-    static func presentVideo(videoURL: URL) {
-        let player = AVPlayer(url: videoURL)
-        let playerViewController = AVPlayerViewController()
-        playerViewController.player = player
-        navigationController.present(playerViewController, animated: true) {
-            playerViewController.player!.play()
-        }
+        navigationController.setViewControllers([homeVC], animated: true)
     }
     
     static func pushContactsViewController(contacts: [CNContact]) {
@@ -63,8 +53,8 @@ struct Router {
         navigationController.pushViewController(contactVC, animated: true)
     }
     
-    static func pushCreateGroupViewController(contacts: [CNContact]) {
-        let createGroupViewModel = CreateGroupViewModel(contacts: contacts)
+    static func pushCreateGroupViewController(contacts: [CNContact], side: CameraSide) {
+        let createGroupViewModel = CreateGroupViewModel(contacts: contacts, cameraSide: side)
         let createGroupVC = CreateGroupViewController(viewModel: createGroupViewModel)
         navigationController.pushViewController(createGroupVC, animated: true)
     }
@@ -73,5 +63,11 @@ struct Router {
         let viewModel = SendVideoViewModel(videoLink: videoLink, contacts: contacts)
         let sendVideoVC = SendVideoViewController(viewModel: viewModel)
         navigationController.pushViewController(sendVideoVC, animated: true)
+    }
+    
+    static func pushVideoPlayerViewController(_ allUserVideos: [UserVideo], selected: UserVideo, cameraSide: CameraSide) {
+        let viewModel = VideoPlayerViewModel(allVideos: allUserVideos, selected: selected)
+        let viewController = VideoPlayerViewController(viewModel: viewModel, side: cameraSide)
+        navigationController.pushViewController(viewController, animated: true)
     }
 }

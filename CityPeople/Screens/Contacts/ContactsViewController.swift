@@ -57,7 +57,8 @@ class ContactsViewController: UIViewController, UITableViewDelegate {
     private func setupViewBindings() {
         viewModel
             .allContacts
-            .bind(to: tableView.rx.items(cellIdentifier: ContactInfoCell.reuseIdentifier, cellType: ContactInfoCell.self)) { (index, contact, cell) in
+            .bind(to: tableView.rx.items(cellIdentifier: ContactInfoCell.reuseIdentifier,
+                                         cellType: ContactInfoCell.self)) { (index, contact, cell) in
                 cell.configure(with: contact)
                 cell.cellButtonTapped = { [weak self] in
                     self?.viewModel.action(friend: contact, isRejected: false)
@@ -112,6 +113,11 @@ class ContactsViewController: UIViewController, UITableViewDelegate {
                 }
             })
             .disposed(by: disposeBag)
+        
+        headerView.showCameraPermissionAlert = { [weak self] in
+            self?.alert(message: AppConstants.cameraPermissionMessage)
+        }
+        
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {

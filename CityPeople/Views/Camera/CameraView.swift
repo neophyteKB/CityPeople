@@ -27,7 +27,6 @@ class CameraView: UIView {
     
     private var cameraViewModel: CameraViewModelProtocol!
     private let disposeBag = DisposeBag()
-    private let currentCameraSide: CameraSide = .front
     
     init(cameraViewModel: CameraViewModelProtocol) {
         super.init(frame: .zero)
@@ -44,7 +43,7 @@ class CameraView: UIView {
 // MARK: - Private methods
     private func setupCamera() {
         do {
-            let input = try AVCaptureDeviceInput(device: currentCameraSide == .front ? getFrontCamera() : getBackCamera())
+            let input = try AVCaptureDeviceInput(device: cameraViewModel.cameraSide == .front ? getFrontCamera() : getBackCamera())
             captureSession.addInput(input)
             
             // Get an instance of ACCapturePhotoOutput class
@@ -96,7 +95,7 @@ class CameraView: UIView {
     
     private func toggleCamera(to side: CameraSide) {
         // Don't toggle if requested side is same to current one
-        if side == currentCameraSide { return }
+        if side == cameraViewModel.cameraSide { return }
         
         do{
             captureSession.removeInput(captureSession.inputs.first!)
@@ -119,7 +118,6 @@ class CameraView: UIView {
 #if !targetEnvironment(simulator)
         setupCamera()
 #endif
-        captureSession.startRunning()
         case .start:
             startVideoRecording()
         case .stop:

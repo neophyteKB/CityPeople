@@ -25,21 +25,32 @@ struct Video: Codable {
     }
 }
 
+struct UserVideo {
+    let name: String
+    let userId: Int
+    let videos: [Video]
+}
+
 extension String {
     var url: URL? { URL(string: self)}
     
-    func getThumbnailImage() -> UIImage? {
-        guard let url = url else { return nil }
-        let asset: AVAsset = AVAsset(url: url)
-        let imageGenerator = AVAssetImageGenerator(asset: asset)
-
-        do {
-            let thumbnailImage = try imageGenerator.copyCGImage(at: CMTimeMake(value: 1, timescale: 60), actualTime: nil)
-            return UIImage(cgImage: thumbnailImage)
-        } catch let error {
-            print(error)
+    func getThumbnailFromUrl(_ completion: @escaping ((_ image: UIImage?)->Void)) {
+        
+        guard let url = url else { return }
+        DispatchQueue.main.async {
+            let asset = AVAsset(url: url)
+            let assetImgGenerate = AVAssetImageGenerator(asset: asset)
+            assetImgGenerate.appliesPreferredTrackTransform = true
+            
+            let time = CMTimeMake(value: 2, timescale: 1)
+            do {
+                let img = try assetImgGenerate.copyCGImage(at: time, actualTime: nil)
+                let thumbnail = UIImage(cgImage: img)
+                completion(thumbnail)
+            } catch let error{
+                print("Error :: ", error)
+                completion(nil)
+            }
         }
-
-        return nil
     }
 }

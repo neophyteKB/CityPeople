@@ -17,6 +17,13 @@ class UserCollectionViewCell: UICollectionViewCell {
         return imageView
     }()
     
+    private let activityIndicator: UIActivityIndicatorView = {
+        let activity = UIActivityIndicatorView()
+        activity.hidesWhenStopped = true
+        activity.style = .medium
+        return activity
+    }()
+    
     private let thumbnailTitle: UILabel = {
         let label = UILabel()
         label.textColor = .white
@@ -36,9 +43,20 @@ class UserCollectionViewCell: UICollectionViewCell {
     }
     
     func configure(with item: Any) {
-        if let item = item as? Video {
-            DispatchQueue.main.async {
-                self.userImageView.image = item.url.getThumbnailImage()
+        
+        if let item = item as? UserVideo {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                if let url = item.videos.first?.url {
+                    self.activityIndicator.startAnimating()
+                    url.getThumbnailFromUrl({ [weak self] image in
+                        guard let imageSelf = self else { return }
+                        imageSelf.userImageView.image = image
+                        imageSelf.activityIndicator.stopAnimating()
+                    })
+                } else {
+                    self.userImageView.image = UIImage(named: Constants.userIcon)
+                }
             }
             thumbnailTitle.text = item.name
         } else {
@@ -48,13 +66,17 @@ class UserCollectionViewCell: UICollectionViewCell {
     }
     
     func setupViewLayouts() {
-        subviews {
+        contentView.subviews {
             userImageView
+            activityIndicator
             thumbnailTitle
         }
         
         userImageView
             .fillContainer()
+        
+        activityIndicator
+            .centerInContainer()
         
         thumbnailTitle
             .left(Constants.padding)

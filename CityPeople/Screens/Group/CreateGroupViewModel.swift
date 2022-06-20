@@ -30,8 +30,10 @@ class CreateGroupViewModel: CreateGroupViewModelProtocol {
     private lazy var allFriends = [Friend]()
     
     private let contacts: [CNContact]
+    private let cameraSide: CameraSide
     
-    init(contacts: [CNContact]) {
+    init(contacts: [CNContact], cameraSide: CameraSide) {
+        self.cameraSide = cameraSide
         self.contacts = contacts
     }
     

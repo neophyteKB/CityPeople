@@ -56,9 +56,13 @@ class SendVideoViewModel: SendVideoViewModelProtocol {
     
     func sendVideo(to friend: Friend) {
         showLoader.accept(true)
-        let params: [String: Any] = [ApiConstants.groups.rawValue: [friend.id],
+        let params: [String: Any] = [ApiConstants.friends.rawValue: [friend.id],
+                                     ApiConstants.groups.rawValue: [],
                                      ApiConstants.location.rawValue: LocationManager.shared.locationString]
-        Network.request(.sendVideo, isMultipart: true, file: videoLink, params: params) { [weak self] (result: Result<Success, String>) in
+        Network.request(.sendVideo,
+                        isMultipart: true,
+                        file: videoLink,
+                        params: params) { [weak self] (result: Result<Success, String>) in
             guard let self = self else { return }
             switch result {
             case .success(let response):

@@ -173,7 +173,20 @@ class VerifyOtpViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] messageType in
                 self?.view.makeToast(messageType.message)
-        }).disposed(by: disposeBag)
+        })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .showLoader
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] showLoader in
+                if showLoader {
+                    self?.view.makeToastActivity(.center)
+                } else {
+                    self?.view.hideToastActivity()
+                }
+        })
+            .disposed(by: disposeBag)
         
         viewModel
             .timeLeft

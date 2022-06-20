@@ -167,6 +167,10 @@ class CreateGroupViewController: UIViewController, UITableViewDelegate {
             .map { String($0.prefix(10))}
             .bind(to: headerView.groupNameField.rx.text)
             .disposed(by: disposeBag)
+        
+        headerView.showCameraPermissionAlert = { [weak self] in
+            self?.alert(message: AppConstants.cameraPermissionMessage)
+        }
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {

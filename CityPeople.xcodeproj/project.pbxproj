@@ -45,6 +45,11 @@
 		8E1F6592284B81FA007C1E37 /* Success.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1F6591284B81FA007C1E37 /* Success.swift */; };
 		8E1F6598284CFCDC007C1E37 /* SearchField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1F6597284CFCDC007C1E37 /* SearchField.swift */; };
 		8E1F659A284FA28B007C1E37 /* Videos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1F6599284FA28B007C1E37 /* Videos.swift */; };
+		8E1F659C2851084D007C1E37 /* VideoPlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1F659B2851084C007C1E37 /* VideoPlayerViewModel.swift */; };
+		8E1F659E2851088E007C1E37 /* VideoPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1F659D2851088E007C1E37 /* VideoPlayerViewController.swift */; };
+		8E1F65A02853B44A007C1E37 /* VideoPlayerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1F659F2853B44A007C1E37 /* VideoPlayerCell.swift */; };
+		8E1F65A9285656B9007C1E37 /* RxGesture in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1F65A8285656B9007C1E37 /* RxGesture */; };
+		8E1F65B1285CCD39007C1E37 /* UserVideoViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1F65B0285CCD39007C1E37 /* UserVideoViewCell.swift */; };
 		8E4E57EA284A5E440030F9AB /* SendVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E4E57E9284A5E440030F9AB /* SendVideoViewController.swift */; };
 		8E4E57EC284A5E500030F9AB /* SendVideoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E4E57EB284A5E500030F9AB /* SendVideoViewModel.swift */; };
 		8E4E57EE284A62C10030F9AB /* SendVideoHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E4E57ED284A62C10030F9AB /* SendVideoHeaderView.swift */; };
@@ -143,6 +148,10 @@
 		8E1F6591284B81FA007C1E37 /* Success.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Success.swift; sourceTree = "<group>"; };
 		8E1F6597284CFCDC007C1E37 /* SearchField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchField.swift; sourceTree = "<group>"; };
 		8E1F6599284FA28B007C1E37 /* Videos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Videos.swift; sourceTree = "<group>"; };
+		8E1F659B2851084C007C1E37 /* VideoPlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerViewModel.swift; sourceTree = "<group>"; };
+		8E1F659D2851088E007C1E37 /* VideoPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerViewController.swift; sourceTree = "<group>"; };
+		8E1F659F2853B44A007C1E37 /* VideoPlayerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerCell.swift; sourceTree = "<group>"; };
+		8E1F65B0285CCD39007C1E37 /* UserVideoViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserVideoViewCell.swift; sourceTree = "<group>"; };
 		8E4E57E9284A5E440030F9AB /* SendVideoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendVideoViewController.swift; sourceTree = "<group>"; };
 		8E4E57EB284A5E500030F9AB /* SendVideoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendVideoViewModel.swift; sourceTree = "<group>"; };
 		8E4E57ED284A62C10030F9AB /* SendVideoHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendVideoHeaderView.swift; sourceTree = "<group>"; };
@@ -177,6 +186,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8E5FE23A283F27ED003A111D /* Toast in Frameworks */,
+				8E1F65A9285656B9007C1E37 /* RxGesture in Frameworks */,
 				8E510274283BEE4800D57F47 /* FirebaseMessaging in Frameworks */,
 				8E510270283BEE4800D57F47 /* FirebaseAnalytics in Frameworks */,
 				8EA6A06C281945F300D3ADEB /* RxCocoa in Frameworks */,
@@ -284,6 +294,7 @@
 		8E19CA2028167A120031D653 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				8E1F65A128564716007C1E37 /* VideoViewController */,
 				8E4E57E8284A5E270030F9AB /* SendVideo */,
 				8E51027A283D296F00D57F47 /* Registration */,
 				8EA093A32823A2E400993014 /* Group */,
@@ -366,6 +377,25 @@
 				8E19CA4C2818512D0031D653 /* Poppins-MediumItalic.ttf */,
 			);
 			path = Poppins;
+			sourceTree = "<group>";
+		};
+		8E1F65A128564716007C1E37 /* VideoViewController */ = {
+			isa = PBXGroup;
+			children = (
+				8E1F65A22856473A007C1E37 /* Views */,
+				8E1F659B2851084C007C1E37 /* VideoPlayerViewModel.swift */,
+				8E1F659D2851088E007C1E37 /* VideoPlayerViewController.swift */,
+			);
+			path = VideoViewController;
+			sourceTree = "<group>";
+		};
+		8E1F65A22856473A007C1E37 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				8E1F659F2853B44A007C1E37 /* VideoPlayerCell.swift */,
+				8E1F65B0285CCD39007C1E37 /* UserVideoViewCell.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		8E4E57E8284A5E270030F9AB /* SendVideo */ = {
@@ -494,6 +524,7 @@
 				8E510284283E8A1300D57F47 /* CountryPicker */,
 				8E510287283E96DD00D57F47 /* IQKeyboardManagerSwift */,
 				8E5FE239283F27ED003A111D /* Toast */,
+				8E1F65A8285656B9007C1E37 /* RxGesture */,
 			);
 			productName = CityPeople;
 			productReference = 8E19C9EB281678EA0031D653 /* CityPeople.app */;
@@ -575,6 +606,7 @@
 				8E510283283E8A1300D57F47 /* XCRemoteSwiftPackageReference "CountryPicker" */,
 				8E510286283E96DD00D57F47 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
 				8E5FE238283F27ED003A111D /* XCRemoteSwiftPackageReference "Toast-Swift" */,
+				8E1F65A7285656B9007C1E37 /* XCRemoteSwiftPackageReference "RxGesture" */,
 			);
 			productRefGroup = 8E19C9EC281678EA0031D653 /* Products */;
 			projectDirPath = "";
@@ -639,8 +671,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				8E19C9F3281678EA0031D653 /* HomeViewController.swift in Sources */,
+				8E1F65B1285CCD39007C1E37 /* UserVideoViewCell.swift in Sources */,
 				8E1F6592284B81FA007C1E37 /* Success.swift in Sources */,
 				8EA093AC2824CA2000993014 /* FriendListCell.swift in Sources */,
+				8E1F659C2851084D007C1E37 /* VideoPlayerViewModel.swift in Sources */,
 				8E5298362821099900CD7E4D /* ContactsViewController.swift in Sources */,
 				8E5298342821098700CD7E4D /* ContactsViewModel.swift in Sources */,
 				8E5FE246284275B6003A111D /* Friend.swift in Sources */,
@@ -663,6 +697,7 @@
 				8EA093A72823A31000993014 /* CreateGroupViewController.swift in Sources */,
 				8E1F659A284FA28B007C1E37 /* Videos.swift in Sources */,
 				8EA093AF282582F700993014 /* CityPeople.xcdatamodeld in Sources */,
+				8E1F65A02853B44A007C1E37 /* VideoPlayerCell.swift in Sources */,
 				8EA6A0722819466E00D3ADEB /* Font_Extension.swift in Sources */,
 				8EA093AA2824C9F500993014 /* CreateGroupHeaderView.swift in Sources */,
 				8E510280283D29B100D57F47 /* RegistrationViewModel.swift in Sources */,
@@ -674,6 +709,7 @@
 				8E1F6598284CFCDC007C1E37 /* SearchField.swift in Sources */,
 				8E19CA362816E84E0031D653 /* HomeScreenHeaderView.swift in Sources */,
 				8EA093A52823A2FD00993014 /* CreateGroupViewModel.swift in Sources */,
+				8E1F659E2851088E007C1E37 /* VideoPlayerViewController.swift in Sources */,
 				8E4E57EA284A5E440030F9AB /* SendVideoViewController.swift in Sources */,
 				8E5FE23F283FDBD3003A111D /* VerifyOtpViewModel.swift in Sources */,
 			);
@@ -1039,6 +1075,14 @@
 				minimumVersion = 5.0.0;
 			};
 		};
+		8E1F65A7285656B9007C1E37 /* XCRemoteSwiftPackageReference "RxGesture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RxSwiftCommunity/RxGesture";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
 		8E51026E283BEE4800D57F47 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -1094,6 +1138,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8E19CA27281680630031D653 /* XCRemoteSwiftPackageReference "Stevia" */;
 			productName = Stevia;
+		};
+		8E1F65A8285656B9007C1E37 /* RxGesture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E1F65A7285656B9007C1E37 /* XCRemoteSwiftPackageReference "RxGesture" */;
+			productName = RxGesture;
 		};
 		8E51026F283BEE4800D57F47 /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;

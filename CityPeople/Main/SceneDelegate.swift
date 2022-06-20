@@ -19,9 +19,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let navigationController = Router.navigationController
-        if Auth.auth().currentUser != nil {
-            let homeVC = HomeViewController()
-            navigationController.setViewControllers([homeVC], animated: true)
+        if Auth.auth().currentUser != nil && UserDefaults.standard.firebaseToken != nil {
+            Router.pushHomeViewController()
         } else {
             let registrationVC = RegistrationViewController(viewModel: RegistrationViewModel())
             navigationController.setViewControllers([registrationVC], animated: true)

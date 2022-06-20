@@ -38,6 +38,16 @@ extension UITableViewHeaderFooterView {
     }
 }
 
+extension UIViewController {
+    func alert(message: String) {
+        let alert = UIAlertController(title: "Settings", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .destructive))
+        alert.addAction(UIAlertAction(title: "Go to Settings", style: .default, handler: { _ in
+            Router.showAppSettings()
+        }))
+        present(alert, animated: true)
+    }
+}
 
 
 

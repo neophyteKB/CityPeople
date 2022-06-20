@@ -11,6 +11,7 @@ import RxRelay
 
 protocol VerifyOtpViewModelProtocol: ViewModelProtocol {
     var timeLeft: PublishRelay<String> { get }
+    var showLoader: PublishRelay<Bool> { get }
     var phoneNumber: String { get }
     func process(otp: String)
     func resendOtp()
@@ -19,6 +20,7 @@ protocol VerifyOtpViewModelProtocol: ViewModelProtocol {
 class VerifyOtpViewModel: VerifyOtpViewModelProtocol {
     
     var toastMessage = PublishRelay<FieldInputs>()
+    var showLoader = PublishRelay<Bool>()
     var timeLeft = PublishRelay<String>()
     var phoneNumber: String {
         userModel.phoneNumber
@@ -48,6 +50,7 @@ class VerifyOtpViewModel: VerifyOtpViewModelProtocol {
     func process(otp: String) {
         let credential = PhoneAuthProvider.provider().credential(withVerificationID: verificationId,
                                                 verificationCode: otp)
+        showLoader.accept(true)
         Auth.auth().signIn(with: credential) { [weak self] auth, error in
             guard let self = self else { return }
             if auth != nil {
@@ -60,20 +63,25 @@ class VerifyOtpViewModel: VerifyOtpViewModelProtocol {
             } else if let error = error {
                 self.toastMessage.accept(.custom(message: error.localizedDescription))
             }
+            self.showLoader.accept(false)
         }
     }
     
     private func saveUserInfo() {
         let name = [userModel.firstName, userModel.lastName].joined(separator: " ")
         let params: [String: Any] = [ApiConstants.name.rawValue: name]
+        showLoader.accept(true)
         Network.request(.user, params: params) { [weak self] (result: Result<UserResponse, String>) in
             guard let self = self else { return }
             switch result {
-            case .success(let user):
-                print(user)
+            case .success:
+                DispatchQueue.main.async {
+                    Router.pushHomeViewController()
+                }
             case .failure(let error):
                 self.toastMessage.accept(.custom(message: error))
             }
+            self.showLoader.accept(false)
         }
     }
     
