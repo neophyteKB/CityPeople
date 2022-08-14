@@ -16,9 +16,6 @@ class CreateGroupViewController: UIViewController, UITableViewDelegate {
     private let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.register(FriendListCell.self, forCellReuseIdentifier: FriendListCell.reuseIdentifier)
-        tableView.register(CreateGroupHeaderView.self, forHeaderFooterViewReuseIdentifier: CreateGroupHeaderView.reuseIdentifier)
-        tableView.estimatedSectionHeaderHeight = 140.0
-        tableView.sectionHeaderHeight = UITableView.automaticDimension
         return tableView
     }()
     
@@ -32,9 +29,13 @@ class CreateGroupViewController: UIViewController, UITableViewDelegate {
         button.contentEdgeInsets = Constants.createGroupBtnEdgeInset
         return button
     }()
+    
+    private var headerView: CreateGroupHeaderView = {
+       return CreateGroupHeaderView()
+    }()
 
     private let disposeBag = DisposeBag()
-    private var createGroupNameField: UITextField!
+    private var createGroupNameField: UITextField { headerView.groupNameField }
     private var viewModel: CreateGroupViewModelProtocol!
     
     init(viewModel: CreateGroupViewModelProtocol) {
@@ -55,16 +56,26 @@ class CreateGroupViewController: UIViewController, UITableViewDelegate {
         // Do any additional setup after loading the view.
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        headerView.disappear()
+    }
+    
     private func setupViewLayouts() {
         view.backgroundColor = .white
         view.subviews {
             tableView
+            headerView
             createGroupButton
         }
         
-        tableView
+        headerView
             .fillHorizontally()
             .Top == view.safeAreaLayoutGuide.Top
+        
+        tableView
+            .fillHorizontally()
+            .Top == headerView.Bottom
         
         createGroupButton.centerHorizontally().height(Constants.createGroupButtonHeight)
         createGroupButton.Top == tableView.Bottom
@@ -88,7 +99,7 @@ class CreateGroupViewController: UIViewController, UITableViewDelegate {
             .disposed(by: disposeBag)
         
         viewModel
-            .selectedFriends
+            .selectedGroups
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
                 self?.tableView.reloadData()
@@ -107,16 +118,16 @@ class CreateGroupViewController: UIViewController, UITableViewDelegate {
             .disposed(by: disposeBag)
         
         viewModel
-            .friends
+            .groups
             .bind(to: tableView
                 .rx
                 .items(cellIdentifier: FriendListCell.reuseIdentifier,
-                       cellType: FriendListCell.self)) { [weak self] (index, friend, cell) in
+                       cellType: FriendListCell.self)) { [weak self] (index, group, cell) in
                 guard let self = self else { return}
-                let isSelected = self.viewModel.isAlreadySelected(friend)
-                cell.configure(with: friend, isSelected: isSelected)
+                let isSelected = self.viewModel.isAlreadySelected(group)
+                cell.configure(with: group, isSelected: isSelected)
                 cell.btnSelectFriendTapped = { [weak self] in
-                    self?.viewModel.update(with: friend)
+                    self?.viewModel.update(with: group)
                 }
                 cell.selectionStyle = .none
             }.disposed(by: disposeBag)
@@ -126,18 +137,10 @@ class CreateGroupViewController: UIViewController, UITableViewDelegate {
             .itemSelected
           .subscribe(onNext: { [weak self] indexPath in
               guard let self = self else { return}
-              self.viewModel.update(with: self.viewModel.friends.value[indexPath.row])
+              self.viewModel.update(with: self.viewModel.groups.value[indexPath.row])
           })
           .disposed(by: disposeBag)
         
-        tableView
-            .rx
-            .setDelegate(self)
-            .disposed(by: disposeBag)
-    }
-    
-    
-    private func setupHeaderViewBindings(_ headerView: CreateGroupHeaderView) {
         headerView
             .backButton
             .rx
@@ -153,8 +156,9 @@ class CreateGroupViewController: UIViewController, UITableViewDelegate {
             .text
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] text in
-                if headerView.searchField.isFirstResponder {
-                    self?.viewModel.search(contact: text ?? "")
+                guard let self = self else { return }
+                if self.headerView.searchField.isFirstResponder {
+                    self.viewModel.search(contact: text ?? "")
                 }
             })
             .disposed(by: disposeBag)
@@ -171,17 +175,6 @@ class CreateGroupViewController: UIViewController, UITableViewDelegate {
         headerView.showCameraPermissionAlert = { [weak self] in
             self?.alert(message: AppConstants.cameraPermissionMessage)
         }
-    }
-    
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: CreateGroupHeaderView.reuseIdentifier) as?  CreateGroupHeaderView else { return nil }
-        setupHeaderViewBindings(headerView)
-        createGroupNameField = headerView.groupNameField
-        return headerView
-    }
-    
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        UITableView.automaticDimension
     }
     
     private func validateCreateGroupFields() {

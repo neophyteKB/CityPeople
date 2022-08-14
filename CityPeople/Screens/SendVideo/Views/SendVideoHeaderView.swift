@@ -67,6 +67,7 @@ class SendVideoHeaderView: UITableViewHeaderFooterView {
     }
     
     private func setupViewLayouts() {
+        contentView.backgroundColor = .white
         contentView.subviews {
             backButton
             videoView

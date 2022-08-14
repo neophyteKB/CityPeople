@@ -55,7 +55,7 @@ class OTPView: UIStackView {
             field.placeholder = "-"
             field.layer.opacity = 0.5
             field.textAlignment = .center
-            field.font = .font(name: .regular, size: 16)
+            field.font = .font(name: .bold, size: 18)
             field.layer.shadowColor = UIColor.black.cgColor
             field.layer.shadowOpacity = 0.1
             field.keyboardType = .decimalPad

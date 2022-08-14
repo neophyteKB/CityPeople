@@ -37,11 +37,14 @@ class VideoPlayerViewModel: VideoPlayerViewModelProtocol {
         let params: [String: Any] = [ApiConstants.friends.rawValue: [selectedUser.userId],
                                      ApiConstants.groups.rawValue: [],
                                      ApiConstants.location.rawValue: LocationManager.shared.locationString]
-        Network.request(.sendVideo, isMultipart: true, file: videoLink, params: params) { [weak self] (result: Result<Success, String>) in
+        Network.multipart(.sendVideo,
+                          file: videoLink,
+                          params: params) { [weak self] (result: Result<Success, String>) in
             guard let self = self else { return }
             switch result {
             case .success(let response):
                 self.toastMessage.accept(.custom(message: response.message ?? ""))
+                FileManager.default.deleteRecordingFile()
             case .failure(let error):
                 self.toastMessage.accept(.custom(message: error))
             }

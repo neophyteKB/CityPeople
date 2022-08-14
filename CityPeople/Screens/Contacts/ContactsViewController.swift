@@ -16,8 +16,12 @@ class ContactsViewController: UIViewController, UITableViewDelegate {
     private let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.register(ContactInfoCell.self, forCellReuseIdentifier: ContactInfoCell.reuseIdentifier)
-        tableView.register(AddFriendHeaderView.self, forHeaderFooterViewReuseIdentifier: AddFriendHeaderView.reuseIdentifier)
         return tableView
+    }()
+    
+    private let headerView: AddFriendHeaderView = {
+        let headerView = AddFriendHeaderView()
+        return headerView
     }()
     
     // MARK: - Private Properties
@@ -42,16 +46,27 @@ class ContactsViewController: UIViewController, UITableViewDelegate {
         // Do any additional setup after loading the view.
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        headerView.disappear()
+    }
+    
     private func setupViewLayouts() {
         view.backgroundColor = .white
         view.subviews {
+            headerView
             tableView
         }
+        
+        headerView
+            .fillHorizontally()
+            .Top == view.safeAreaLayoutGuide.Top
         
         tableView
             .fillHorizontally()
             .bottom(Constants.zeroValue)
-            .Top == view.safeAreaLayoutGuide.Top
+            .Top == headerView.Bottom
+        
     }
     
     private func setupViewBindings() {
@@ -85,14 +100,7 @@ class ContactsViewController: UIViewController, UITableViewDelegate {
                 }
             })
             .disposed(by: disposeBag)
-        
-        tableView
-            .rx
-            .setDelegate(self)
-            .disposed(by: disposeBag)
-    }
-    
-    private func setupHeaderViewBindings(_ headerView: AddFriendHeaderView) {
+
         headerView
             .backButton
             .rx
@@ -108,8 +116,9 @@ class ContactsViewController: UIViewController, UITableViewDelegate {
             .text
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] text in
-                if headerView.searchField.isFirstResponder {
-                    self?.viewModel.search(contact: text ?? "")
+                guard let self = self else { return }
+                if self.headerView.searchField.isFirstResponder {
+                    self.viewModel.search(contact: text ?? "")
                 }
             })
             .disposed(by: disposeBag)
@@ -119,13 +128,7 @@ class ContactsViewController: UIViewController, UITableViewDelegate {
         }
         
     }
-    
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: AddFriendHeaderView.reuseIdentifier) as?  AddFriendHeaderView else { return nil }
-        setupHeaderViewBindings(headerView)
-        return headerView
-    }
-    
+
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         UITableView.automaticDimension
     }

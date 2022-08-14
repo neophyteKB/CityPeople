@@ -11,26 +11,28 @@ import RxRelay
 
 protocol SendVideoViewModelProtocol: ViewModelProtocol {
     var showLoader: PublishRelay<Bool> { get }
+    var videoSent: PublishRelay<Bool> { get}
     var reloadTableView: PublishRelay<Void> { get }
     var videoUrl: URL { get }
-    var friends: BehaviorRelay<[Friend]> { get }
-    func update(with contact: Friend)
-    func isAlreadySelected(_ friend: Friend) -> Bool
-    func sendVideo(to friend: Friend)
+    var groups: BehaviorRelay<[Group]> { get }
+    func update(with contact: Group)
+    func isAlreadySelected(_ group: Group) -> Bool
+    func sendVideo(to group: Group)
     func search(contact keyword: String)
 }
 
 class SendVideoViewModel: SendVideoViewModelProtocol {
     var toastMessage = PublishRelay<FieldInputs>()
     var reloadTableView = PublishRelay<Void>()
-    var friends = BehaviorRelay<[Friend]>(value: [])
+    var groups = BehaviorRelay<[Group]>(value: [])
     var showLoader = PublishRelay<Bool>()
+    var videoSent = PublishRelay<Bool>()
     var videoUrl: URL { self.videoLink }
     
     private let videoLink: URL
     private let contacts: [CNContact]
-    private lazy var allFriends = [Friend]()
-    private lazy var selectedFriends = [Friend]()
+    private lazy var allGroups = [Group]()
+    private lazy var selectedFriends = [Group]()
     
     init(videoLink: URL, contacts: [CNContact]) {
         self.videoLink = videoLink
@@ -38,14 +40,29 @@ class SendVideoViewModel: SendVideoViewModelProtocol {
     }
     
     func onViewDidLoad() {
-        fetchFriends()
+        fetchGroups()
     }
     
-    func isAlreadySelected(_ friend: Friend) -> Bool {
-        selectedFriends.firstIndex(where: {$0.id == friend.id}) != nil
+    // MARK: - Private Methods
+    private func fetchGroups() {
+        Network.request(.groups) { [weak self] (result: Result<GroupsResponse, String>) in
+            guard let self = self else { return }
+            switch result {
+            case let .success(response):
+                self.groups.accept(response.users)
+                self.allGroups = response.users
+            case let .failure(error):
+                self.toastMessage.accept(.custom(message: error))
+            }
+            self.showLoader.accept(false)
+        }
     }
     
-    func update(with contact: Friend) {
+    func isAlreadySelected(_ group: Group) -> Bool {
+        selectedFriends.firstIndex(where: {$0.id == group.id}) != nil
+    }
+    
+    func update(with contact: Group) {
         if let index = selectedFriends.firstIndex(where: {$0.id == contact.id}) {
             selectedFriends.remove(at: index)
         } else {
@@ -54,55 +71,36 @@ class SendVideoViewModel: SendVideoViewModelProtocol {
         reloadTableView.accept(())
     }
     
-    func sendVideo(to friend: Friend) {
+    func sendVideo(to group: Group) {
         showLoader.accept(true)
-        let params: [String: Any] = [ApiConstants.friends.rawValue: [friend.id],
-                                     ApiConstants.groups.rawValue: [],
+        let params: [String: Any] = [ApiConstants.friends.rawValue: group.id,
                                      ApiConstants.location.rawValue: LocationManager.shared.locationString]
-        Network.request(.sendVideo,
-                        isMultipart: true,
-                        file: videoLink,
-                        params: params) { [weak self] (result: Result<Success, String>) in
+        Network.multipart(.sendVideo,
+                          file: videoLink,
+                          params: params) { [weak self] (result: Result<Success, String>) in
             guard let self = self else { return }
+            self.selectedFriends.removeAll()
+            self.showLoader.accept(false)
             switch result {
             case .success(let response):
                 self.toastMessage.accept(.custom(message: response.message ?? ""))
+                FileManager.default.deleteRecordingFile()
+                self.videoSent.accept(true)
             case .failure(let error):
                 self.toastMessage.accept(.custom(message: error))
+                self.videoSent.accept(false)
             }
-            self.showLoader.accept(false)
         }
     }
     
     func search(contact keyword: String) {
         if keyword.isEmpty {
-            self.friends.accept(allFriends)
+            self.groups.accept(allGroups)
         } else {
-            let filteredContacts = allFriends.filter { contact in
+            let filteredContacts = allGroups.filter { contact in
                 (contact.name.range(of: keyword, options: .caseInsensitive) != nil)
             }
-            self.friends.accept(filteredContacts)
-        }
-    }
-    
-    private func fetchFriends() {
-        var phoneNumbers = [String]()
-        contacts.forEach { contact in
-            phoneNumbers.append(contentsOf: contact.phoneNumbers.compactMap({$0.value.stringValue.replacingOccurrences(of: " ", with: "")}))
-        }
-        let params: [String: Any] = [ApiConstants.contacts.rawValue: phoneNumbers]
-        showLoader.accept(true)
-        Network.request(.contacts, params: params) { [weak self] (result: Result<FriendResponse, String>) in
-            guard let self = self else { return }
-            switch result {
-            case let .success(response):
-                self.friends.accept(response.users)
-                self.allFriends = response.users
-            case let .failure(error):
-                self.toastMessage.accept(.custom(message: error))
-            }
-            self.reloadTableView.accept(())
-            self.showLoader.accept(false)
+            self.groups.accept(filteredContacts)
         }
     }
 }

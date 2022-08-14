@@ -52,14 +52,20 @@ class ContactsViewModel: ContactsProtocol {
             guard let self = self else { return }
             switch result {
             case let .success(response):
-                for friend in response.users {
-                    if let index = _users.firstIndex(where: {$0.phone == friend.phone}) {
-                        _users.remove(at: index)
-                        let user = User(phone: friend.phone, name: friend.name, id: friend.id, isRegistered: true, requestStatus: friend.requestStatus, isFriend: friend.alreadyFriend)
-                        _users.insert(user, at: 0)
+                if response.status, let users = response.users {
+                    for friend in users {
+                        if let index = _users.firstIndex(where: {$0.phone == friend.phone}) {
+                            _users.remove(at: index)
+                            let user = User(phone: friend.phone, name: friend.name, id: friend.id, isRegistered: true, requestStatus: friend.requestStatus, isFriend: friend.alreadyFriend)
+                            _users.insert(user, at: 0)
+                        }
                     }
+                    self.allContacts.accept(_users)
+                } else if let message = response.message {
+                    self.toastMessage.accept(.custom(message: message))
+                } else {
+                    self.toastMessage.accept(.custom(message: "Something went wrong!"))
                 }
-                self.allContacts.accept(_users)
             case let .failure(error):
                 self.toastMessage.accept(.custom(message: error))
             }

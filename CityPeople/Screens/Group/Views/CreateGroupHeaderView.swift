@@ -11,7 +11,7 @@ import RxRelay
 import RxSwift
 import Stevia
 
-class CreateGroupHeaderView: UITableViewHeaderFooterView {
+class CreateGroupHeaderView: UIView {
     
     var showCameraPermissionAlert:(() -> ())?
     
@@ -56,24 +56,31 @@ class CreateGroupHeaderView: UITableViewHeaderFooterView {
     
     private lazy var cameraView: CameraView = {
         let cameraView = CameraView(cameraViewModel: cameraViewModel)
-        cameraView.backgroundColor = UIColor(white: 0.8, alpha: 1.0)
+        cameraView.backgroundColor = .clear
         return cameraView
     }()
     
     private let disposeBag = DisposeBag()
-    private var cameraViewModel: CameraViewModelProtocol = CameraViewModel(cameraSide: .front)
+    private let cameraViewModel: CameraViewModelProtocol = CameraViewModel(cameraSide: .front)
     
-    override init(reuseIdentifier: String?) {
-        super.init(reuseIdentifier: CreateGroupHeaderView.reuseIdentifier)
+    init() {
+        super.init(frame: .zero)
         setupViewLayouts()
-//        checkOrAskCameraPermissions()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.checkOrAskCameraPermissions()
+        }
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func disappear() {
+        cameraViewModel.videoAction.accept(.remove)
+    }
+    
     private func setupViewLayouts() {
+        backgroundColor = .white
         subviews {
             backButton
             createGroupLabel

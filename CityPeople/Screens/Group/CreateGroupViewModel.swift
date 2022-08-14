@@ -11,23 +11,23 @@ import RxRelay
 import SwiftUI
 
 protocol CreateGroupViewModelProtocol: ViewModelProtocol {
-    var friends: BehaviorRelay<[Friend]> { get }
-    var selectedFriends: BehaviorRelay<[Friend]> { get }
+    var groups: BehaviorRelay<[Group]> { get }
+    var selectedGroups: BehaviorRelay<[Group]> { get }
     var showLoader: PublishRelay<Bool> { get }
     var isContactsPermissionGranted: PublishRelay<Bool> { get }
-    func isAlreadySelected(_ friend: Friend) -> Bool
-    func update(with contact: Friend)
+    func isAlreadySelected(_ group: Group) -> Bool
+    func update(with contact: Group)
     func createGroup(name: String)
     func search(contact keyword: String)
 }
 
 class CreateGroupViewModel: CreateGroupViewModelProtocol {
-    var friends = BehaviorRelay<[Friend]>(value: [])
-    var selectedFriends = BehaviorRelay<[Friend]>(value: [])
+    var groups = BehaviorRelay<[Group]>(value: [])
+    var selectedGroups = BehaviorRelay<[Group]>(value: [])
     var showLoader = PublishRelay<Bool>()
     var toastMessage = PublishRelay<FieldInputs>()
     var isContactsPermissionGranted = PublishRelay<Bool>()
-    private lazy var allFriends = [Friend]()
+    private lazy var allGroups = [Group]()
     
     private let contacts: [CNContact]
     private let cameraSide: CameraSide
@@ -38,23 +38,17 @@ class CreateGroupViewModel: CreateGroupViewModelProtocol {
     }
     
     func onViewDidLoad() {
-        fetchFriends()
+        fetchGroups()
     }
     
     // MARK: - Private Methods
-    private func fetchFriends() {
-        var phoneNumbers = [String]()
-        contacts.forEach { contact in
-            phoneNumbers.append(contentsOf: contact.phoneNumbers.compactMap({$0.value.stringValue.replacingOccurrences(of: " ", with: "")}))
-        }
-        let params: [String: Any] = [ApiConstants.contacts.rawValue: phoneNumbers]
-        showLoader.accept(true)
-        Network.request(.contacts, params: params) { [weak self] (result: Result<FriendResponse, String>) in
+    private func fetchGroups() {
+        Network.request(.groups) { [weak self] (result: Result<GroupsResponse, String>) in
             guard let self = self else { return }
             switch result {
             case let .success(response):
-                self.friends.accept(response.users)
-                self.allFriends = response.users
+                self.groups.accept(response.users)
+                self.allGroups = response.users
             case let .failure(error):
                 self.toastMessage.accept(.custom(message: error))
             }
@@ -62,13 +56,14 @@ class CreateGroupViewModel: CreateGroupViewModelProtocol {
         }
     }
     
-    func isAlreadySelected(_ friend: Friend) -> Bool {
-        selectedFriends.value.firstIndex(where: {$0.id == friend.id}) != nil
+    // MARK: Protocol Methods
+    func isAlreadySelected(_ group: Group) -> Bool {
+        selectedGroups.value.firstIndex(where: {$0.id == group.id}) != nil
     }
     
     func createGroup(name: String) {
         let params: [String: Any] = [ApiConstants.name.rawValue: name,
-                                     ApiConstants.ids.rawValue: selectedFriends.value.map({$0.id})]
+                                     ApiConstants.ids.rawValue: selectedGroups.value.map({$0.id})]
         showLoader.accept(true)
         Network.request(.createGroup, params: params) { [weak self] (result: Result<Success, String>) in
             guard let self = self else { return }
@@ -82,24 +77,24 @@ class CreateGroupViewModel: CreateGroupViewModelProtocol {
         }
     }
     
-    func update(with contact: Friend) {
-        var selected = selectedFriends.value
+    func update(with contact: Group) {
+        var selected = selectedGroups.value
         if let index = selected.firstIndex(where: {$0.id == contact.id}) {
             selected.remove(at: index)
         } else { 
             selected.append(contact)
         }
-        selectedFriends.accept(selected)
+        selectedGroups.accept(selected)
     }
     
     func search(contact keyword: String) {
         if keyword.isEmpty {
-            self.friends.accept(allFriends)
+            self.groups.accept(allGroups)
         } else {
-            let filteredContacts = allFriends.filter { contact in
+            let filteredContacts = allGroups.filter { contact in
                 (contact.name.range(of: keyword, options: .caseInsensitive) != nil)
             }
-            self.friends.accept(filteredContacts)
+            self.groups.accept(filteredContacts)
         }
     }
 }

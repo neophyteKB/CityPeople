@@ -80,8 +80,8 @@ class FriendListCell: UITableViewCell {
             .disposed(by: disposeBag)
     }
     
-    func configure(with friend: Friend, isSelected: Bool) {
-        title.text = friend.name
+    func configure(with group: Group, isSelected: Bool) {
+        title.text = group.name
         btnSelect.isSelected = isSelected
     }
     

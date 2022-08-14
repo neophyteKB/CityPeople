@@ -10,6 +10,7 @@ import AVFoundation
 import SwiftyContacts
 import RxSwift
 import RxRelay
+import SwiftUI
 
 protocol HomeViewModelProtocol: ViewModelProtocol {
     var items: BehaviorRelay<[Any]> { get }
@@ -18,6 +19,7 @@ protocol HomeViewModelProtocol: ViewModelProtocol {
     var contacts: BehaviorRelay<[CNContact]> { get }
     var cameraViewModel: CameraViewModelProtocol { get }
     var videos: [UserVideo] { get }
+    var isCmaeraPaused: Bool { get set }
     func onViewWillDisappear()
     func requestVideos()
     func camera(action userAction: VideoAction)
@@ -29,6 +31,7 @@ class HomeViewModel: HomeViewModelProtocol {
     var items = BehaviorRelay<[Any]>(value: [])
     var isCameraPermissionGranted = PublishRelay<Bool>()
     var contacts = BehaviorRelay<[CNContact]>(value: [])
+    var isCmaeraPaused: Bool = false
     var cameraViewModel: CameraViewModelProtocol = {
         CameraViewModel(cameraSide: .front)
     }()

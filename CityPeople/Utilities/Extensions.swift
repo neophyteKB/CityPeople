@@ -49,5 +49,18 @@ extension UIViewController {
     }
 }
 
-
-
+extension FileManager {
+    var videoFileUrl: URL {
+        guard let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { fatalError() }
+        return documentsURL.appendingPathComponent("video.mp4")
+    }
+    func deleteRecordingFile() {
+        do {
+            try removeItem(at: videoFileUrl)
+            print("File deleted successfully at - \(videoFileUrl.absoluteString)")
+        } catch {
+            print("Unable to delete the file at - \(videoFileUrl.absoluteString)")
+            print("Error ----- \(error)")
+        }
+    }
+}

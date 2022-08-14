@@ -84,29 +84,28 @@ class SendVideoViewController: UIViewController, UITableViewDelegate {
             .disposed(by: disposeBag)
         
         viewModel
-            .friends
+            .groups
             .bind(to: tableView
                 .rx
                 .items(cellIdentifier: FriendListCell.reuseIdentifier,
-                       cellType: FriendListCell.self)) { [weak self] (index, friend, cell) in
+                       cellType: FriendListCell.self)) { [weak self] (index, group, cell) in
                 guard let self = self else { return}
-                let isSelected = self.viewModel.isAlreadySelected(friend)
-                cell.configure(with: friend, isSelected: isSelected)
+                let isSelected = self.viewModel.isAlreadySelected(group)
+                cell.configure(with: group, isSelected: isSelected)
                 cell.btnSelectFriendTapped = { [weak self] in
-                    self?.viewModel.update(with: friend)
-                    self?.viewModel.sendVideo(to: friend)
+                    self?.viewModel.update(with: group)
+                    self?.viewModel.sendVideo(to: group)
                 }
                 cell.selectionStyle = .none
             }.disposed(by: disposeBag)
         
-//        tableView
-//            .rx
-//            .itemSelected
-//          .subscribe(onNext: { [weak self] indexPath in
-//              guard let self = self else { return}
-//              self.viewModel.update(with: self.viewModel.friends.value[indexPath.row])
-//          })
-//          .disposed(by: disposeBag)
+        viewModel
+            .videoSent
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                self?.tableView.reloadData()
+            })
+            .disposed(by: disposeBag)
         
         tableView
             .rx

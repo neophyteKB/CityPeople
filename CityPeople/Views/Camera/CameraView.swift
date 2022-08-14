@@ -56,6 +56,12 @@ class CameraView: UIView {
             videoPreviewLayer.frame = layer.bounds
             layer.addSublayer(videoPreviewLayer)
             clipsToBounds = true
+            
+            // Set video settings to produce MP4 if supported
+            if videoOutput.availableVideoCodecTypes.contains(.h264), let connection = videoOutput.connection(with: .video) {
+                videoOutput.setOutputSettings([AVVideoCodecKey: AVVideoCodecType.h264], for: connection)
+            }
+            
             captureSession.startRunning()
         } catch {
           fatalError()
@@ -100,7 +106,7 @@ class CameraView: UIView {
         do{
             captureSession.removeInput(captureSession.inputs.first!)
             
-            if(side == .front){
+            if(side == .front) {
                 cameraDevice = getFrontCamera()
             } else {
                 cameraDevice = getBackCamera()
@@ -118,6 +124,8 @@ class CameraView: UIView {
 #if !targetEnvironment(simulator)
         setupCamera()
 #endif
+        case .resume:
+            captureSession.startRunning()
         case .start:
             startVideoRecording()
         case .stop:
@@ -128,8 +136,8 @@ class CameraView: UIView {
     }
     
     private func startVideoRecording() {
-        guard let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
-        let filePath = documentsURL.appendingPathComponent("video.mp4")
+        FileManager.default.deleteRecordingFile()
+        let filePath = FileManager.default.videoFileUrl
         videoOutput.startRecording(to: filePath, recordingDelegate: self)
     }
     
@@ -140,11 +148,13 @@ class CameraView: UIView {
 
 extension CameraView: AVCaptureFileOutputRecordingDelegate {
     func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
-        print(outputFileURL)
-        cameraViewModel.video.accept(outputFileURL)
+        let asset = AVAsset(url: outputFileURL)
+        if CMTimeGetSeconds(asset.duration) > 1 {
+            cameraViewModel.video.accept(outputFileURL)
+        }
+        cameraViewModel.stopped.accept(())
     }
     func captureOutput(captureOutput: AVCaptureFileOutput!, didFinishRecordingToOutputFileAtURL outputFileURL: NSURL!, fromConnections connections: [AnyObject]!, error: NSError!) {
-//        UISaveVideoAtPathToSa .vedPhotosAlbum(outputFileURL.absoluteString!, nil, nil, nil)
         print("Finished")
     }
 }

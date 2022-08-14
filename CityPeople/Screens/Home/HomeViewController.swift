@@ -47,7 +47,7 @@ class HomeViewController: UIViewController {
     private var timer: Timer?
     
     // Private Properties
-    private let viewModel: HomeViewModelProtocol = HomeViewModel()
+    private var viewModel: HomeViewModelProtocol = HomeViewModel()
     private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
@@ -61,10 +61,16 @@ class HomeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         viewModel.requestVideos()
-        DispatchQueue.main.async {
-            self.frontCameraVideoRecordingButton.animate(duration: 0, color: .cityGreen)
-            self.rearCameraVideoRecordingButton.animate(duration: 0, color: .cityGreen)
+        resetControls()
+        if viewModel.isCmaeraPaused {
+            viewModel.cameraViewModel.videoAction.accept(.resume)
         }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        viewModel.isCmaeraPaused = true
+        viewModel.cameraViewModel.videoAction.accept(.remove)
     }
 
     private func setupViewLayouts() {
@@ -109,6 +115,13 @@ class HomeViewController: UIViewController {
             .Bottom == view.safeAreaLayoutGuide.Bottom
     }
     
+    private func resetControls() {
+        DispatchQueue.main.async {
+            self.frontCameraVideoRecordingButton.animate(duration: 0, color: .cityGreen)
+            self.rearCameraVideoRecordingButton.animate(duration: 0, color: .cityGreen)
+        }
+    }
+    
     private func setupViewBindings() {
         frontCameraVideoRecordingButton.addTarget(self, action: #selector(btnPressed(_:)), for: .touchDown)
         frontCameraVideoRecordingButton.addTarget(self, action: #selector(btnReleased), for: .touchUpInside)
@@ -146,6 +159,15 @@ class HomeViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
+        viewModel
+            .cameraViewModel
+            .stopped
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] message in
+                self?.resetControls()
+            })
+            .disposed(by: disposeBag)
+        
         headerView
             .isLocationPermissionsDenied
             .observe(on: MainScheduler.instance)
@@ -172,12 +194,16 @@ class HomeViewController: UIViewController {
         
         collectionView
             .rx
-            .modelSelected(UserVideo.self)
+            .modelSelected(AnyObject.self)
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] item in
                 guard let self = self else { return }
+                if let item = item as? UserVideo {
                 Router.pushVideoPlayerViewController(self.viewModel.videos, selected: item,
                                                      cameraSide: self.viewModel.cameraViewModel.cameraSide)
+                } else {
+                    self.push(to: .friends)
+                }
             }).disposed(by: disposeBag)
         
     }
@@ -245,6 +271,8 @@ private enum Constants {
     static let titleViewHeight: CGFloat = 24.0
     static let timeLabelHeight: CGFloat = 20.0
     static let videoRecordingLength: CGFloat = 10.0
+    static let cameraWidth = screenWidth * 0.25
+    static let cameraHeight = cameraWidth * (16/9)
     
     static let logoIcon = "citypeople_logo_splash"
     static let cameraOptionsIcon = "circle_img_green"

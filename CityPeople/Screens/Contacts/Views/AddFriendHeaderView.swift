@@ -10,7 +10,7 @@ import AVFoundation
 import RxSwift
 import Stevia
 
-class AddFriendHeaderView: UITableViewHeaderFooterView {
+class AddFriendHeaderView: UIView {
     
     var showCameraPermissionAlert:(() -> ())?
 
@@ -38,21 +38,27 @@ class AddFriendHeaderView: UITableViewHeaderFooterView {
     
     private lazy var cameraView: CameraView = {
         let cameraView = CameraView(cameraViewModel: cameraViewModel)
-        cameraView.backgroundColor = UIColor(white: 0.8, alpha: 1.0)
+        cameraView.backgroundColor = .clear
         return cameraView
     }()
     
     private let disposeBag = DisposeBag()
     private let cameraViewModel: CameraViewModelProtocol = CameraViewModel(cameraSide: .front)
     
-    override init(reuseIdentifier: String?) {
-        super.init(reuseIdentifier: CreateGroupHeaderView.reuseIdentifier)
+    init() {
+        super.init(frame: .zero)
         setupViewLayouts()
-//        checkOrAskCameraPermissions()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.checkOrAskCameraPermissions()
+        }
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func disappear() {
+        cameraViewModel.videoAction.accept(.remove)
     }
     
     private func checkOrAskCameraPermissions() {
@@ -77,6 +83,7 @@ class AddFriendHeaderView: UITableViewHeaderFooterView {
     }
     
     private func setupViewLayouts() {
+        backgroundColor = .white
         subviews {
             backButton
             searchField
