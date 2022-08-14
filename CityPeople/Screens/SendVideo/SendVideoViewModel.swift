@@ -76,7 +76,7 @@ class SendVideoViewModel: SendVideoViewModelProtocol {
         let params: [String: Any] = [ApiConstants.friends.rawValue: group.id,
                                      ApiConstants.location.rawValue: LocationManager.shared.locationString]
         Network.multipart(.sendVideo,
-                          file: FileManager.default.videoFileUrl,
+                          file: videoLink,
                           params: params) { [weak self] (result: Result<Success, String>) in
             guard let self = self else { return }
             self.selectedFriends.removeAll()

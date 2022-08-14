@@ -93,7 +93,8 @@ class SendVideoViewController: UIViewController, UITableViewDelegate {
                 let isSelected = self.viewModel.isAlreadySelected(group)
                 cell.configure(with: group, isSelected: isSelected)
                 cell.btnSelectFriendTapped = { [weak self] in
-                    self?.processSendVideo(to: group)
+                    self?.viewModel.update(with: group)
+                    self?.viewModel.sendVideo(to: group)
                 }
                 cell.selectionStyle = .none
             }.disposed(by: disposeBag)
@@ -110,25 +111,6 @@ class SendVideoViewController: UIViewController, UITableViewDelegate {
             .rx
             .setDelegate(self)
             .disposed(by: disposeBag)
-    }
-    
-    private func processSendVideo(to group: Group) {
-        viewModel.showLoader.accept(true)
-        viewModel.update(with: group)
-        FileManager.default.recordedFileUrl.encodeVideo { [weak self] exportSession in
-            guard let self = self else { return }
-            switch exportSession.status {
-            case .cancelled:
-                break
-            case .failed:
-                print(exportSession.error ?? "")
-            case .completed:
-                self.viewModel.sendVideo(to: group)
-            case .exporting:
-                print("Exporting.....")
-            default: break
-            }
-        }
     }
     
     private func setupHeaderViewBindings(_ headerView: SendVideoHeaderView) {

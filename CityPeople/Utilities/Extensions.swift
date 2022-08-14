@@ -56,41 +56,13 @@ extension FileManager {
         return documentsURL.appendingPathComponent("video.mp4")
     }
     
-    var recordedFileUrl: URL {
-        guard let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { fatalError() }
-        return documentsURL.appendingPathComponent("recorded_video.mov")
-    }
-    
-    func deleteRecordingFile(_ url: URL = FileManager.default.videoFileUrl) {
+    func deleteRecordingFile() {
         do {
-            try removeItem(at: url)
-            print("File deleted successfully at - \(url.absoluteString)")
+            try removeItem(at: videoFileUrl)
+            print("File deleted successfully at - \(videoFileUrl.absoluteString)")
         } catch {
-            print("Unable to delete the file at - \(url.absoluteString)")
+            print("Unable to delete the file at - \(videoFileUrl.absoluteString)")
             print("Error ----- \(error)")
-        }
-    }
-}
-
-extension URL {
-    func encodeVideo(completion: @escaping ((AVAssetExportSession) -> Void))  {
-        let outputFileUrl = FileManager.default.videoFileUrl
-        let avAsset = AVURLAsset(url: self)
-        
-        //Create Export session
-        guard let exportSession = AVAssetExportSession(asset: avAsset, presetName: AVAssetExportPresetPassthrough) else { return }
-        
-        //Check if the file already exists then remove the previous file
-        FileManager.default.deleteRecordingFile()
-        exportSession.outputURL = outputFileUrl
-        exportSession.outputFileType = .mp4
-        exportSession.shouldOptimizeForNetworkUse = true
-        let start = CMTimeMakeWithSeconds(0.0, preferredTimescale: 0)
-        let range = CMTimeRange(start: start, duration: avAsset.duration)
-        exportSession.timeRange = range
-        
-        exportSession.exportAsynchronously {
-            completion(exportSession)
         }
     }
 }

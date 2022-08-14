@@ -136,9 +136,9 @@ class CameraView: UIView {
     }
     
     private func startVideoRecording() {
-        let recordingFileUrl = FileManager.default.recordedFileUrl
-        FileManager.default.deleteRecordingFile(recordingFileUrl)
-        videoOutput.startRecording(to: recordingFileUrl, recordingDelegate: self)
+        let fileUrl = FileManager.default.videoFileUrl
+        FileManager.default.deleteRecordingFile()
+        videoOutput.startRecording(to: fileUrl, recordingDelegate: self)
     }
     
     private func stopVideoRecording() {
