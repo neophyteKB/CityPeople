@@ -101,10 +101,8 @@ class VideoPlayerViewController: UIViewController {
             rearCameraVideoRecordingButton
         }
         
-        DispatchQueue.main.async {
-            self.frontCameraVideoRecordingButton.animate(duration: 0, color: .cityGreen)
-            self.rearCameraVideoRecordingButton.animate(duration: 0, color: .cityGreen)
-        }
+        
+        resetControls()
         locationTitle.text = LocationManager.shared.locationString
         
         collectionView
@@ -140,6 +138,13 @@ class VideoPlayerViewController: UIViewController {
             .centerHorizontally()
             .size(Constants.frontEndCameraButtonSizeDimension)
             .Bottom == view.safeAreaLayoutGuide.Bottom
+    }
+    
+    private func resetControls() {
+        DispatchQueue.main.async {
+            self.frontCameraVideoRecordingButton.animate(duration: 0, color: .cityGreen)
+            self.rearCameraVideoRecordingButton.animate(duration: 0, color: .cityGreen)
+        }
     }
     
     private func setupViewBindings() {
@@ -190,11 +195,7 @@ class VideoPlayerViewController: UIViewController {
             .showLoader
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] showLoader in
-                if showLoader {
-                    self?.view.makeToastActivity(.center)
-                } else {
-                    self?.view.hideToastActivity()
-                }
+                self?.makeToast(isVisible: showLoader)
             })
             .disposed(by: disposeBag)
         
@@ -213,10 +214,27 @@ class VideoPlayerViewController: UIViewController {
                 self?.viewModel.sendVideo(videoLink)
             })
             .disposed(by: disposeBag)
+        
+        cameraViewModel
+            .stopped
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] message in
+                self?.resetControls()
+            })
+            .disposed(by: disposeBag)
     }
     
     private func showCamera() {
         cameraViewModel.videoAction.accept(.show)
+    }
+    
+    private func makeToast(isVisible: Bool) {
+        view.isUserInteractionEnabled = !isVisible
+        if isVisible {
+            view.makeToastActivity(.center)
+        } else {
+            view.hideToastActivity()
+        }
     }
     
     private func move(to side: MoveTo) {

@@ -151,7 +151,7 @@ enum EndPoints: String {
             endPoint = endPoint+key+"="+"\(value)"+"&"
         }
         let finalString = String(endPoint.prefix(endPoint.count-1))
-        return finalString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        return finalString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!.replacingOccurrences(of: "+", with: "%2B")
       }
 }
 
@@ -162,7 +162,7 @@ enum ApiConstants: String {
     case friendId = "friend_id"
     case ids
     case friends = "friends[]"
-    case groups
+    case groups = "groups[]"
     case location
     case video
     case accept

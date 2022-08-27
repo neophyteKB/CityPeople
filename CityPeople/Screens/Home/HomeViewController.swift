@@ -55,12 +55,12 @@ class HomeViewController: UIViewController {
         setupViewLayouts()
         setupViewBindings()
         viewModel.onViewDidLoad()
+        viewModel.requestVideos()
         // Do any additional setup after loading the view.
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        viewModel.requestVideos()
         resetControls()
         if viewModel.isCmaeraPaused {
             viewModel.cameraViewModel.videoAction.accept(.resume)

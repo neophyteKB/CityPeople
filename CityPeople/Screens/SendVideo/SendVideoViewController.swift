@@ -74,12 +74,7 @@ class SendVideoViewController: UIViewController, UITableViewDelegate {
             .showLoader
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] show in
-                if show {
-                    self?.view.makeToastActivity(.center)
-                } else {
-                    self?.view.hideToastActivity()
-                    self?.tableView.reloadData()
-                }
+                self?.showLoader(isVisible: show)
             })
             .disposed(by: disposeBag)
         
@@ -111,6 +106,16 @@ class SendVideoViewController: UIViewController, UITableViewDelegate {
             .rx
             .setDelegate(self)
             .disposed(by: disposeBag)
+    }
+    
+    private func showLoader(isVisible: Bool) {
+        view.isUserInteractionEnabled = !isVisible
+        if isVisible {
+            view.makeToastActivity(.center)
+        } else {
+            view.hideToastActivity()
+            tableView.reloadData()
+        }
     }
     
     private func setupHeaderViewBindings(_ headerView: SendVideoHeaderView) {

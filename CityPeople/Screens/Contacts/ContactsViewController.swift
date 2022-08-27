@@ -93,11 +93,7 @@ class ContactsViewController: UIViewController, UITableViewDelegate {
             .showLoader
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] show in
-                if show {
-                    self?.view.makeToastActivity(.center)
-                } else {
-                    self?.view.hideToastActivity()
-                }
+                self?.showLoader(isVisible: show)
             })
             .disposed(by: disposeBag)
 
@@ -126,7 +122,15 @@ class ContactsViewController: UIViewController, UITableViewDelegate {
         headerView.showCameraPermissionAlert = { [weak self] in
             self?.alert(message: AppConstants.cameraPermissionMessage)
         }
-        
+    }
+    
+    private func showLoader(isVisible: Bool) {
+        view.isUserInteractionEnabled = !isVisible
+        if isVisible {
+            view.makeToastActivity(.center)
+        } else {
+            view.hideToastActivity()
+        }
     }
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {

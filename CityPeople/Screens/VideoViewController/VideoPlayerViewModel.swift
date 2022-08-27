@@ -34,17 +34,20 @@ class VideoPlayerViewModel: VideoPlayerViewModelProtocol {
     
     func sendVideo(_ videoLink: URL) {
         showLoader.accept(true)
-        let params: [String: Any] = [ApiConstants.friends.rawValue: [selectedUser.userId],
-                                     ApiConstants.groups.rawValue: [],
+        let params: [String: Any] = [ApiConstants.friends.rawValue: selectedUser.userId,
+                                     ApiConstants.groups.rawValue: "",
                                      ApiConstants.location.rawValue: LocationManager.shared.locationString]
         Network.multipart(.sendVideo,
-                          file: videoLink,
+                          file: FileManager.default.videoFileUrl,
                           params: params) { [weak self] (result: Result<Success, String>) in
             guard let self = self else { return }
             switch result {
             case .success(let response):
+                if response.status {
+                    FileManager.default.deleteRecordingFile()
+                }
                 self.toastMessage.accept(.custom(message: response.message ?? ""))
-                FileManager.default.deleteRecordingFile()
+                
             case .failure(let error):
                 self.toastMessage.accept(.custom(message: error))
             }

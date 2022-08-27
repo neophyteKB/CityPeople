@@ -180,11 +180,7 @@ class VerifyOtpViewController: UIViewController {
             .showLoader
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] showLoader in
-                if showLoader {
-                    self?.view.makeToastActivity(.center)
-                } else {
-                    self?.view.hideToastActivity()
-                }
+                self?.showLoader(isVisible: showLoader)
         })
             .disposed(by: disposeBag)
         
@@ -196,6 +192,15 @@ class VerifyOtpViewController: UIViewController {
                 self.timerMessageLabel.text = Constants.timerMessage + time
         }).disposed(by: disposeBag)
         
+    }
+    
+    private func showLoader(isVisible: Bool) {
+        view.isUserInteractionEnabled = !isVisible
+        if isVisible {
+            view.makeToastActivity(.center)
+        } else {
+            view.hideToastActivity()
+        }
     }
     
     private func subTitleAttributes() {

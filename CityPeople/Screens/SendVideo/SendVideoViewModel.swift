@@ -83,9 +83,13 @@ class SendVideoViewModel: SendVideoViewModelProtocol {
             self.showLoader.accept(false)
             switch result {
             case .success(let response):
-                self.toastMessage.accept(.custom(message: response.message ?? ""))
-                FileManager.default.deleteRecordingFile()
-                self.videoSent.accept(true)
+                if response.status {
+                    self.toastMessage.accept(.custom(message: response.message ?? "Sent successfully"))
+                    FileManager.default.deleteRecordingFile()
+                    self.videoSent.accept(true)
+                } else if let message = response.message {
+                        self.toastMessage.accept(.custom(message: message))
+                }
             case .failure(let error):
                 self.toastMessage.accept(.custom(message: error))
                 self.videoSent.accept(false)
